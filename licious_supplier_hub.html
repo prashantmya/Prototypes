@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Licious Supplier Hub - Seawater Fish Sourcing</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            liciousRed: '#E52331',
+            liciousRedDark: '#C81C29',
+            liciousSlate: '#1E293B',
+            liciousWarmGray: '#F8FAFC',
+            liciousBorder: '#E2E8F0',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom mobile viewport scrollbars and animations */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 4px;
+    }
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2.5s infinite ease-in-out;
+    }
+    /* Banner drawer smooth transition */
+    .banner-transition {
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+    }
+  </style>
+</head>
+
+<body class="bg-slate-900 min-h-screen flex items-center justify-center font-sans antialiased p-0 sm:p-4 text-slate-800">
+
+  <!-- Outer Smartphone Shell Container -->
+  <div class="w-full max-w-[430px] bg-white h-[100vh] sm:h-[890px] sm:rounded-[42px] shadow-2xl border-0 sm:border-[10px] border-slate-800 relative flex flex-col overflow-hidden">
+
+    <!-- Phone Status Bar -->
+    <div class="bg-liciousSlate text-white px-5 pt-3 pb-2 flex justify-between items-center text-xs font-semibold z-30 shrink-0">
+      <span id="liveClock">09:41</span>
+      <div class="w-20 h-4 bg-black rounded-full mx-auto hidden sm:block"></div>
+      <div class="flex items-center space-x-2 text-[11px]">
+        <i class="fa-solid fa-signal"></i>
+        <i class="fa-solid fa-wifi"></i>
+        <i class="fa-solid fa-battery-full text-xs"></i>
+      </div>
+    </div>
+
+    <!-- App Header with Licious Branding -->
+    <header class="bg-liciousRed text-white px-4 py-3 shadow-md flex justify-between items-center z-20 shrink-0">
+      <div class="flex items-center space-x-3">
+        <!-- Licious Pill Brand Badge -->
+        <div class="bg-white text-liciousRed font-black px-2.5 py-0.5 rounded-md text-lg italic tracking-tighter shadow-sm">
+          Licious
+        </div>
+        <div>
+          <h1 class="text-xs font-black uppercase tracking-wider text-red-100 leading-none">Supplier Hub</h1>
+          <p class="text-[10px] text-white/90 font-medium">Seawater Fish Sourcing</p>
+        </div>
+      </div>
+
+      <!-- Gmail Style Profile Icon (S) -->
+      <button onclick="toggleProfileModal()" class="relative focus:outline-none group">
+        <div class="w-9 h-9 rounded-full bg-slate-900 border-2 border-white/90 text-white font-extrabold flex items-center justify-center text-sm shadow group-active:scale-95 transition-transform">
+          S
+        </div>
+        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
+      </button>
+    </header>
+
+    <!-- Main Scrollable App Content Viewport -->
+    <main class="flex-1 overflow-y-auto bg-liciousWarmGray relative p-3 space-y-3 pb-36" id="mainScrollContainer">
+
+      <!-- 6 Modern Square Grid Modules Switcher -->
+      <section class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200/80">
+        <div class="flex justify-between items-center mb-2 px-1">
+          <span class="text-[11px] font-black text-slate-500 uppercase tracking-wider">Sourcing Modules</span>
+          <span class="text-[10px] text-liciousRed font-bold cursor-pointer" onclick="showTab('tiering')">View Dashboard</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <!-- Square 1: Tiering & Score -->
+          <button onclick="showTab('tiering')" id="grid-btn-tiering" class="module-card p-2.5 rounded-xl border border-slate-100 bg-slate-50 hover:bg-red-50 flex flex-col items-center justify-center text-center transition-all group">
+            <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-trophy text-xs"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 leading-tight">Tier & Score</span>
+            <span class="text-[9px] text-amber-600 font-extrabold">Gold (88)</span>
+          </button>
+
+          <!-- Square 2: Weekly Incentive -->
+          <button onclick="showTab('incentive')" id="grid-btn-incentive" class="module-card p-2.5 rounded-xl border border-slate-100 bg-slate-50 hover:bg-red-50 flex flex-col items-center justify-center text-center transition-all group">
+            <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-indian-rupee-sign text-xs"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 leading-tight">Incentive</span>
+            <span class="text-[9px] text-emerald-600 font-extrabold">₹2,450</span>
+          </button>
+
+          <!-- Square 3: Communication Channel (Catch Log) -->
+          <button onclick="showTab('logging')" id="grid-btn-logging" class="module-card p-2.5 rounded-xl border border-slate-100 bg-slate-50 hover:bg-red-50 flex flex-col items-center justify-center text-center transition-all group">
+            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-clipboard-list text-xs"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 leading-tight">Catch Entry</span>
+            <span class="text-[9px] text-blue-600 font-semibold">Daily Log</span>
+          </button>
+
+          <!-- Square 4: Fish Grading Assistant -->
+          <button onclick="showTab('grading')" id="grid-btn-grading" class="module-card p-2.5 rounded-xl border border-slate-100 bg-slate-50 hover:bg-red-50 flex flex-col items-center justify-center text-center transition-all group">
+            <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-fish text-xs"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 leading-tight">Grading Tool</span>
+            <span class="text-[9px] text-indigo-600 font-semibold">SKU Diagnostic</span>
+          </button>
+
+          <!-- Square 5: Supplier Feedback / NPS -->
+          <button onclick="showTab('feedback')" id="grid-btn-feedback" class="module-card p-2.5 rounded-xl border border-slate-100 bg-slate-50 hover:bg-red-50 flex flex-col items-center justify-center text-center transition-all group">
+            <div class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-star text-xs"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 leading-tight">Feedback</span>
+            <span class="text-[9px] text-purple-600 font-semibold">NPS Today</span>
+          </button>
+
+          <!-- Square 6: Order Received -->
+          <button onclick="showTab('orders')" id="grid-btn-orders" class="module-card p-2.5 rounded-xl border border-slate-100 bg-slate-50 hover:bg-red-50 flex flex-col items-center justify-center text-center transition-all group relative">
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-liciousRed opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-liciousRed"></span>
+            </span>
+            <div class="w-8 h-8 rounded-lg bg-rose-100 text-liciousRed flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-box-open text-xs"></i>
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 leading-tight">Orders</span>
+            <span class="text-[9px] text-liciousRed font-extrabold">#FO-9821</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= TAB 1: TIERING AND SCORE ================= -->
+      <div id="tab-tiering" class="tab-content space-y-3">
+        <!-- Main Gold Tier Badge Header Card -->
+        <div class="bg-gradient-to-br from-liciousSlate to-slate-900 text-white rounded-2xl p-4 shadow-md relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 opacity-10 text-8xl text-amber-400">
+            <i class="fa-solid fa-award"></i>
+          </div>
+
+          <div class="flex justify-between items-start relative z-10">
+            <div>
+              <div class="inline-flex items-center space-x-1.5 bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2">
+                <i class="fa-solid fa-crown text-[10px]"></i>
+                <span>Gold Tier Partner</span>
+              </div>
+              <h2 class="text-lg font-extrabold tracking-tight">Supplier Scorecard</h2>
+              <p class="text-[10px] text-slate-300 mt-0.5">Dock Terminal: Vizag Seawater Bay</p>
+            </div>
+
+            <!-- Score Badge with Info i Button -->
+            <div class="flex items-center space-x-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">
+              <div class="text-right">
+                <span class="text-2xl font-black text-amber-400 leading-none">88</span>
+                <span class="text-[10px] text-slate-300 block font-medium">/ 100</span>
+              </div>
+              <button onclick="openTierInfoModal()" class="w-7 h-7 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors focus:outline-none" title="Score Matrix Info">
+                <i class="fa-solid fa-info text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Advice Section: How to Reach Platinum / Maintain Gold -->
+          <div class="mt-3.5 pt-2.5 border-t border-white/10 relative z-10">
+            <div class="flex justify-between items-center text-xs mb-1">
+              <span class="text-slate-300 font-medium text-[11px]">Next Milestone: <strong class="text-white">Platinum (92+ Score)</strong></span>
+              <span class="text-amber-400 font-extrabold text-[11px]">+4 pts needed</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-white/10">
+              <div class="bg-gradient-to-r from-amber-400 to-yellow-300 h-full rounded-full" style="width: 88%"></div>
+            </div>
+            <p class="text-[10px] text-slate-300 mt-1.5 flex items-start">
+              <i class="fa-solid fa-circle-check text-emerald-400 mr-1.5 mt-0.5 text-[10px]"></i>
+              <span>Maintain >95% fill rate & ice temp &lt;2°C for 4 consecutive dock dispatches to unlock Platinum perks.</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Subsection Attributes Title -->
+        <div class="flex justify-between items-center px-1">
+          <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-wider">Score Sub-attribute Breakdown</h3>
+          <span class="text-[10px] text-liciousRed font-bold">Tap card for details</span>
+        </div>
+
+        <!-- 6 Sub-Attributes List -->
+        <div class="space-y-2">
+          <!-- 1. Price Score -->
+          <div onclick="openScoreDetail('Price Score', 92, '20%', 'Competitive index based on daily Vizag dock auction benchmarks.', 'Ice cost adjustment +2%, Direct dock delivery bonus included.')" 
+               class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm hover:border-liciousRed transition-all cursor-pointer flex items-center justify-between group">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-black text-xs">
+                20%
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-slate-800 group-hover:text-liciousRed transition-colors">1. Price Score</h4>
+                <p class="text-[10px] text-slate-400">Benchmarked against Vizag Auction</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black text-emerald-600">92/100</span>
+              <i class="fa-solid fa-chevron-right text-xs text-slate-300 group-hover:text-liciousRed"></i>
+            </div>
+          </div>
+
+          <!-- 2. Fill Rate -->
+          <div onclick="openScoreDetail('Fill Rate', 85, '25%', 'Percentage of promised catch weight delivered to Licious dock.', 'Fulfilled 1,120 kg out of 1,315 kg weekly target across 5 SKUs.')" 
+               class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm hover:border-liciousRed transition-all cursor-pointer flex items-center justify-between group">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-black text-xs">
+                25%
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-slate-800 group-hover:text-liciousRed transition-colors">2. Fill Rate</h4>
+                <p class="text-[10px] text-slate-400">Promised vs Actual Weight</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black text-blue-600">85/100</span>
+              <i class="fa-solid fa-chevron-right text-xs text-slate-300 group-hover:text-liciousRed"></i>
+            </div>
+          </div>
+
+          <!-- 3. Quality & Grading Accuracy -->
+          <div onclick="openScoreDetail('Quality & Grading Accuracy', 90, '25%', 'QC dock grading compliance, temperature logs (<2°C), & freshness checks.', 'Ice ratio compliance 100%. 3 minor grading mismatches recorded last week.')" 
+               class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm hover:border-liciousRed transition-all cursor-pointer flex items-center justify-between group">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center font-black text-xs">
+                25%
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-slate-800 group-hover:text-liciousRed transition-colors">3. Quality & Grading</h4>
+                <p class="text-[10px] text-slate-400">Dock QC & Temperature Check</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black text-indigo-600">90/100</span>
+              <i class="fa-solid fa-chevron-right text-xs text-slate-300 group-hover:text-liciousRed"></i>
+            </div>
+          </div>
+
+          <!-- 4. SKU Spread -->
+          <div onclick="openScoreDetail('SKU Spread', 80, '10%', 'Diversity of seawater catch supplied across high-demand species.', 'Active supply in Surmai, Pomfret, Yellowfin Tuna & Red Snapper.')" 
+               class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm hover:border-liciousRed transition-all cursor-pointer flex items-center justify-between group">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-black text-xs">
+                10%
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-slate-800 group-hover:text-liciousRed transition-colors">4. SKU Spread</h4>
+                <p class="text-[10px] text-slate-400">Species Catalog Diversity</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black text-amber-600">80/100</span>
+              <i class="fa-solid fa-chevron-right text-xs text-slate-300 group-hover:text-liciousRed"></i>
+            </div>
+          </div>
+
+          <!-- 5. Scale / Quantity per SKU -->
+          <div onclick="openScoreDetail('Scale / Quantity per SKU', 84, '10%', 'Consistency of bulk batch volume per individual fish SKU.', 'Average batch volume: 75kg per SKU per boat arrival.')" 
+               class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm hover:border-liciousRed transition-all cursor-pointer flex items-center justify-between group">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-700 flex items-center justify-center font-black text-xs">
+                10%
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-slate-800 group-hover:text-liciousRed transition-colors">5. Scale / Qty per SKU</h4>
+                <p class="text-[10px] text-slate-400">Batch Volume Consistency</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black text-purple-600">84/100</span>
+              <i class="fa-solid fa-chevron-right text-xs text-slate-300 group-hover:text-liciousRed"></i>
+            </div>
+          </div>
+
+          <!-- 6. Attendance / Availability Days -->
+          <div onclick="openScoreDetail('Attendance / Availability Days', 95, '10%', 'Active days supplier was available to accept and dispatch orders.', 'Available 6 out of 7 operating dock days this week.')" 
+               class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm hover:border-liciousRed transition-all cursor-pointer flex items-center justify-between group">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-lg bg-rose-50 text-rose-700 flex items-center justify-center font-black text-xs">
+                10%
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-slate-800 group-hover:text-liciousRed transition-colors">6. Availability / Days</h4>
+                <p class="text-[10px] text-slate-400">6 of 7 Active Days Logged</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-black text-rose-600">95/100</span>
+              <i class="fa-solid fa-chevron-right text-xs text-slate-300 group-hover:text-liciousRed"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= TAB 2: WEEKLY INCENTIVE ================= -->
+      <div id="tab-incentive" class="tab-content space-y-3 hidden">
+        <!-- Money Earned Banner (₹2,450) -->
+        <div class="bg-gradient-to-r from-emerald-800 to-liciousSlate text-white rounded-2xl p-4 shadow-md relative">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-[10px] text-emerald-300 font-bold uppercase tracking-wider">Money Earned Until Now (This Week)</p>
+              <div class="flex items-baseline space-x-2 mt-1">
+                <span class="text-3xl font-black text-white">₹2,450</span>
+                <span class="text-[10px] text-emerald-400 font-bold bg-emerald-950/70 px-2 py-0.5 rounded-md border border-emerald-500/30">Active Payout</span>
+              </div>
+              <p class="text-[10px] text-slate-300 mt-1">Next Settlement: Monday Morning, 10:00 AM</p>
+            </div>
+
+            <!-- How Bonuses Work i Button -->
+            <button onclick="openBonusInfoModal()" class="w-9 h-9 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center border border-white/20 shadow transition-all active:scale-95" title="How Bonuses Work">
+              <i class="fa-solid fa-circle-info text-base"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Weekly Daily Breakdown List -->
+        <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80">
+          <div class="flex justify-between items-center mb-3">
+            <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Weekly Payout Breakdown</h3>
+            <span class="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-md">6 Days Completed</span>
+          </div>
+
+          <div class="space-y-2">
+            <!-- Mon -->
+            <div class="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-[10px]">Mon</span>
+                <div>
+                  <p class="font-bold text-slate-800">Quality & Ice Temp Bonus</p>
+                  <p class="text-[10px] text-slate-400">180kg Kingfish delivered &lt;2°C</p>
+                </div>
+              </div>
+              <span class="font-black text-emerald-600 text-xs">+₹450</span>
+            </div>
+
+            <!-- Tue -->
+            <div class="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-[10px]">Tue</span>
+                <div>
+                  <p class="font-bold text-slate-800">On-Time Dock Slot Bonus</p>
+                  <p class="text-[10px] text-slate-400">Arrived 05:15 AM (Slot 05:30)</p>
+                </div>
+              </div>
+              <span class="font-black text-emerald-600 text-xs">+₹350</span>
+            </div>
+
+            <!-- Wed -->
+            <div class="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-[10px]">Wed</span>
+                <div>
+                  <p class="font-bold text-slate-800">Grade Consistency Bonus</p>
+                  <p class="text-[10px] text-slate-400">0% mismatch rate on Silver Pomfret</p>
+                </div>
+              </div>
+              <span class="font-black text-emerald-600 text-xs">+₹500</span>
+            </div>
+
+            <!-- Thu -->
+            <div class="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-[10px]">Thu</span>
+                <div>
+                  <p class="font-bold text-slate-800">Fill Rate Milestone</p>
+                  <p class="text-[10px] text-slate-400">100% promised order fulfilled</p>
+                </div>
+              </div>
+              <span class="font-black text-emerald-600 text-xs">+₹650</span>
+            </div>
+
+            <!-- Fri -->
+            <div class="flex items-center justify-between text-xs p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+              <div class="flex items-center space-x-2.5">
+                <span class="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 font-bold flex items-center justify-center text-[10px]">Fri</span>
+                <div>
+                  <p class="font-bold text-slate-800">Direct Dock Ice Bonus</p>
+                  <p class="text-[10px] text-slate-400">Chilled slush temp 1.2°C</p>
+                </div>
+              </div>
+              <span class="font-black text-emerald-600 text-xs">+₹500</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= TAB 3: CATCH LOGGING ================= -->
+      <div id="tab-logging" class="tab-content space-y-3 hidden">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+          <div class="flex justify-between items-center mb-3">
+            <div>
+              <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wide">Daily Catch Logging</h3>
+              <p class="text-[10px] text-slate-400">Vizag Dock #4 - Seawater Sourcing</p>
+            </div>
+
+            <!-- Quick Action Buttons: Voice & CSV -->
+            <div class="flex space-x-1.5">
+              <button onclick="simulateVoiceDictation()" class="px-2.5 py-1.5 bg-red-50 text-liciousRed rounded-lg text-xs font-bold hover:bg-red-100 transition-colors flex items-center space-x-1" title="Voice Input">
+                <i class="fa-solid fa-microphone"></i>
+                <span class="text-[10px]">Mic</span>
+              </button>
+              <button onclick="openCSVModal()" class="px-2.5 py-1.5 bg-slate-100 text-slate-700 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors flex items-center space-x-1" title="Upload CSV">
+                <i class="fa-solid fa-file-csv"></i>
+                <span class="text-[10px]">CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Row Addition Form -->
+          <form id="catchLogForm" onsubmit="handleCatchLogSubmit(event)" class="space-y-3">
+            <div class="space-y-2" id="catchRowsContainer">
+              <!-- Default Row 1 -->
+              <div class="catch-row grid grid-cols-12 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 items-center">
+                <!-- SKU Dropdown -->
+                <div class="col-span-5">
+                  <label class="text-[9px] font-bold text-slate-500 uppercase block mb-0.5">Fish SKU</label>
+                  <select class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-liciousRed">
+                    <option value="Kingfish / Surmai">Kingfish (Surmai)</option>
+                    <option value="Silver Pomfret">Silver Pomfret</option>
+                    <option value="Red Snapper">Red Snapper</option>
+                    <option value="Yellowfin Tuna">Yellowfin Tuna</option>
+                    <option value="Asian Sea Bass">Asian Sea Bass</option>
+                  </select>
+                </div>
+
+                <!-- Grade Dropdown -->
+                <div class="col-span-4">
+                  <label class="text-[9px] font-bold text-slate-500 uppercase block mb-0.5">Grade</label>
+                  <select class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-liciousRed">
+                    <option value="Grade A+">Grade A+ (Export)</option>
+                    <option value="Grade A">Grade A (Prime)</option>
+                    <option value="Grade B">Grade B (Fresh)</option>
+                  </select>
+                </div>
+
+                <!-- Qty Enter -->
+                <div class="col-span-3 relative">
+                  <label class="text-[9px] font-bold text-slate-500 uppercase block mb-0.5">Qty (kg)</label>
+                  <input type="number" value="50" placeholder="Kgs" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-black text-slate-800 focus:outline-none focus:border-liciousRed">
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="flex justify-between items-center pt-1">
+              <button type="button" onclick="addCatchRow()" class="text-xs text-liciousRed font-extrabold flex items-center space-x-1 hover:underline">
+                <i class="fa-solid fa-circle-plus text-xs"></i>
+                <span>+ Add Row</span>
+              </button>
+
+              <button type="button" onclick="triggerCameraSimulation()" class="text-xs text-slate-700 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg font-bold flex items-center space-x-1">
+                <i class="fa-solid fa-camera text-slate-500"></i>
+                <span>Catch Image</span>
+              </button>
+            </div>
+
+            <!-- Catch Image Preview Box -->
+            <div id="photoPreviewBox" class="hidden bg-slate-100 border-2 border-dashed border-slate-300 rounded-xl p-2.5 text-center">
+              <img id="catchPhotoImg" src="https://images.unsplash.com/photo-1534483509719-3feaee7c30da?auto=format&fit=crop&w=400&q=80" alt="Catch Preview" class="h-28 w-full object-cover rounded-lg shadow-sm mb-1.5">
+              <div class="flex justify-between items-center text-[10px] text-slate-500 px-1">
+                <span><i class="fa-solid fa-check-circle text-emerald-500 mr-1"></i>Dock Tagged Photo</span>
+                <button type="button" onclick="removeCatchPhoto()" class="text-red-500 font-bold hover:underline">Remove</button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full bg-liciousRed hover:bg-liciousRedDark text-white font-black text-xs py-2.5 rounded-xl shadow transition-all active:scale-95 flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>Submit Availability Log</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ================= TAB 4: FISH GRADING ASSISTANCE TOOL ================= -->
+      <div id="tab-grading" class="tab-content space-y-3 hidden">
+
+        <!-- Top Reference Table: Grade Reference Guide -->
+        <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 space-y-2">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Fish Grade Reference Guide</h3>
+            <span class="text-[10px] text-slate-400">Licious Dock Standards</span>
+          </div>
+
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <!-- Grade A+ -->
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-1.5">
+              <span class="inline-block bg-emerald-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded mb-0.5">GRADE A+</span>
+              <p class="text-[9px] font-bold text-slate-800">Prime Export</p>
+              <p class="text-[8px] text-slate-500">&lt; 1.5°C ice, crimson gills</p>
+            </div>
+
+            <!-- Grade A -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-1.5">
+              <span class="inline-block bg-blue-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded mb-0.5">GRADE A</span>
+              <p class="text-[9px] font-bold text-slate-800">Fresh Counter</p>
+              <p class="text-[8px] text-slate-500">&lt; 2.5°C ice, bright gills</p>
+            </div>
+
+            <!-- Grade B -->
+            <div class="bg-amber-50 border border-amber-200 rounded-xl p-1.5">
+              <span class="inline-block bg-amber-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded mb-0.5">GRADE B</span>
+              <p class="text-[9px] font-bold text-slate-800">Local Market</p>
+              <p class="text-[8px] text-slate-500">&lt; 4.0°C ice, firm flesh</p>
+            </div>
+
+            <!-- Grade C -->
+            <div class="bg-rose-50 border border-rose-200 rounded-xl p-1.5">
+              <span class="inline-block bg-rose-600 text-white font-black text-[9px] px-1.5 py-0.5 rounded mb-0.5">GRADE C</span>
+              <p class="text-[9px] font-bold text-slate-800">Curry Cut</p>
+              <p class="text-[8px] text-slate-500">Minor skin loss</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mismatch Pill Summary Banner -->
+        <div onclick="openMismatchModal()" class="bg-amber-500/10 border-2 border-amber-500/40 rounded-xl p-3 shadow-sm hover:bg-amber-500/20 transition-all cursor-pointer flex items-center justify-between group">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-700 flex items-center justify-center shrink-0 font-bold">
+              ⚠️
+            </div>
+            <p class="text-xs font-extrabold text-amber-900 leading-snug">
+              3 Grading mismatches found last week. <span class="text-liciousRed underline block text-[11px] font-bold">Tap to view details</span>
+            </p>
+          </div>
+          <i class="fa-solid fa-chevron-right text-xs text-amber-700 group-hover:translate-x-0.5 transition-transform"></i>
+        </div>
+
+        <!-- Dynamic SKU Diagnostic Questionnaire -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+          <div>
+            <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Dynamic SKU Diagnostic Questionnaire</h3>
+            <p class="text-[10px] text-slate-400">Questions change dynamically depending on selected SKU</p>
+          </div>
+
+          <!-- SKU Selector -->
+          <div>
+            <label class="text-[10px] font-bold text-slate-600 block mb-1 uppercase">Select Fish SKU for Diagnostic:</label>
+            <select id="gradingSkuSelect" onchange="renderSkuQuestions()" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-liciousRed">
+              <option value="Kingfish">Kingfish (Surmai)</option>
+              <option value="Silver Pomfret">Silver Pomfret</option>
+              <option value="Red Snapper">Red Snapper</option>
+            </select>
+          </div>
+
+          <!-- Dynamic Questions Box -->
+          <div id="dynamicQuestionsBox" class="space-y-3 pt-2 border-t border-slate-100">
+            <!-- JS dynamically injects 5-6 questions per SKU -->
+          </div>
+
+          <!-- Calculate Grade Button -->
+          <button onclick="calculateGradeResult()" class="w-full bg-liciousSlate hover:bg-black text-white font-bold text-xs py-2.5 rounded-xl shadow transition-all active:scale-95 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-calculator"></i>
+            <span>Calculate Assigned Grade</span>
+          </button>
+
+          <!-- Calculated Output Box -->
+          <div id="gradeResultBox" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-center space-y-1">
+            <span class="text-[10px] text-slate-500 uppercase font-semibold">QC Diagnostic Output</span>
+            <div id="gradeResultBadge" class="text-base font-black text-emerald-700">
+              ASSIGNED GRADE: GRADE A+ (Export Quality)
+            </div>
+            <p id="gradeResultNotes" class="text-[10px] text-slate-600">
+              98% compliance match. Eligible for premium Gold Tier incentive bonus.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= TAB 5: SUPPLIER FEEDBACK / NPS ================= -->
+      <div id="tab-feedback" class="tab-content space-y-3 hidden">
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+
+          <!-- 1 Daily Feedback Allowed Status Banner -->
+          <div id="feedbackStatusBanner" class="bg-blue-50 border border-blue-200 rounded-xl p-2.5 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-circle-info text-blue-600 text-xs"></i>
+              <span class="text-[11px] font-bold text-blue-900">1 daily feedback allowed</span>
+            </div>
+            <span id="feedbackStatusBadge" class="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full">Open Today</span>
+          </div>
+
+          <div>
+            <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Rate Dock Logistics Experience</h3>
+            <p class="text-[10px] text-slate-400">Direct NPS feedback to Licious Seawater Sourcing Team</p>
+          </div>
+
+          <!-- Star Rating -->
+          <div class="flex justify-center items-center space-x-2 py-2">
+            <button onclick="setStarRating(1)" class="star-btn text-2xl text-slate-300 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+            <button onclick="setStarRating(2)" class="star-btn text-2xl text-slate-300 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+            <button onclick="setStarRating(3)" class="star-btn text-2xl text-slate-300 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+            <button onclick="setStarRating(4)" class="star-btn text-2xl text-amber-400 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+            <button onclick="setStarRating(5)" class="star-btn text-2xl text-amber-400 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+          </div>
+
+          <!-- Text area or Mic Button -->
+          <div class="relative">
+            <textarea id="feedbackComment" rows="3" placeholder="Enter comments regarding ice availability, crate unloading speed, or dock timing..." class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs text-slate-800 focus:outline-none focus:border-liciousRed"></textarea>
+            <button onclick="simulateVoiceFeedback()" class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded-lg bg-liciousRed text-white flex items-center justify-center text-xs shadow hover:bg-liciousRedDark transition-colors" title="Voice Feedback">
+              <i class="fa-solid fa-microphone"></i>
+            </button>
+          </div>
+
+          <button id="feedbackSubmitBtn" onclick="submitSupplierFeedback()" class="w-full bg-liciousRed hover:bg-liciousRedDark text-white font-bold text-xs py-2.5 rounded-xl shadow transition-all active:scale-95 flex items-center justify-center space-x-2">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Submit Daily NPS</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= TAB 6: ORDER RECEIVED ================= -->
+      <div id="tab-orders" class="tab-content space-y-3 hidden">
+
+        <!-- Active Order Card #FO-9821 -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+          <div class="flex justify-between items-start pb-2 border-b border-slate-100">
+            <div>
+              <span class="text-[9px] font-bold text-slate-400 uppercase">Incoming Order Received</span>
+              <h3 class="text-sm font-extrabold text-slate-800">Order #FO-9821</h3>
+            </div>
+            <div class="text-right">
+              <span class="bg-rose-100 text-liciousRed font-black text-[10px] px-2.5 py-1 rounded-full flex items-center space-x-1">
+                <i class="fa-solid fa-clock text-[9px] mr-1"></i>
+                <span id="orderTimerText">14m 32s</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Line items breakdown -->
+          <div>
+            <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-1.5">SKU Level Quantity Requested:</h4>
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs p-2 bg-slate-50 rounded-xl">
+                <span class="font-bold text-slate-800">Kingfish (Surmai)</span>
+                <span class="font-black text-liciousRed">50 Kg</span>
+              </div>
+              <div class="flex justify-between items-center text-xs p-2 bg-slate-50 rounded-xl">
+                <span class="font-bold text-slate-800">Silver Pomfret</span>
+                <span class="font-black text-liciousRed">40 Kg</span>
+              </div>
+              <div class="flex justify-between items-center text-xs p-2 bg-slate-50 rounded-xl">
+                <span class="font-bold text-slate-800">Red Snapper</span>
+                <span class="font-black text-liciousRed">30 Kg</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="space-y-2 pt-2">
+            <button onclick="handleOrderAction('accept')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 rounded-xl shadow transition-all active:scale-95 flex items-center justify-center space-x-1.5">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Mark Full Order Ready</span>
+            </button>
+
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="openReduceQtyModal()" class="bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 font-bold text-[11px] py-2 rounded-xl transition-all active:scale-95 flex items-center justify-center space-x-1">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Adjust Qty</span>
+              </button>
+
+              <button onclick="openRejectOrderModal()" class="bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 font-bold text-[11px] py-2 rounded-xl transition-all active:scale-95 flex items-center justify-center space-x-1">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <span>Reject Order</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ================= PERSISTENT FLOATING COLLAPSIBLE LIVE ORDER BANNER ================= -->
+    <!-- Positioned directly above the bottom section navigation bar at all times -->
+    <div id="floatingLiveOrderBanner" class="absolute bottom-[60px] left-0 right-0 z-40 px-2.5 pointer-events-auto">
+      
+      <div class="bg-liciousSlate text-white rounded-2xl shadow-2xl border-2 border-liciousRed/80 overflow-hidden backdrop-blur-md transition-all duration-300">
+        
+        <!-- Collapsed Header Bar (Always Visible) -->
+        <div onclick="toggleOrderBanner()" class="p-2.5 flex items-center justify-between cursor-pointer hover:bg-slate-800/80 transition-colors">
+          <div class="flex items-center space-x-2">
+            <span class="relative flex h-2.5 w-2.5">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-liciousRed opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-liciousRed"></span>
+            </span>
+            <span class="text-xs font-black text-white tracking-tight">
+              ⚡ Live Order: <strong class="text-amber-400">#FO-9821</strong>
+            </span>
+            <span class="text-[9px] bg-red-600 text-white font-extrabold px-1.5 py-0.5 rounded-md hidden xs:inline-block">
+              120kg (3 SKUs)
+            </span>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="event.stopPropagation(); showTab('orders');" class="bg-liciousRed hover:bg-liciousRedDark text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow">
+              View
+            </button>
+            <!-- Toggle Chevron Icon -->
+            <button id="bannerToggleChevron" class="text-white text-xs w-6 h-6 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-transform">
+              <i class="fa-solid fa-chevron-up"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Expanded Drawer Content -->
+        <div id="bannerExpandedContent" class="hidden px-3 pb-3 pt-1 border-t border-slate-700/80 space-y-2.5 text-xs bg-slate-900/90">
+          <div class="flex justify-between items-center text-[10px] text-slate-300">
+            <span>Vizag Dock Delivery Slot: <strong>05:30 AM</strong></span>
+            <span class="text-amber-400 font-bold">Pending Response</span>
+          </div>
+
+          <!-- SKU Summary Grid -->
+          <div class="grid grid-cols-3 gap-1.5 text-center">
+            <div class="bg-slate-800 p-1.5 rounded-lg border border-slate-700">
+              <span class="text-[9px] text-slate-400 block">Surmai</span>
+              <span class="text-xs font-extrabold text-white">50 Kg</span>
+            </div>
+            <div class="bg-slate-800 p-1.5 rounded-lg border border-slate-700">
+              <span class="text-[9px] text-slate-400 block">Pomfret</span>
+              <span class="text-xs font-extrabold text-white">40 Kg</span>
+            </div>
+            <div class="bg-slate-800 p-1.5 rounded-lg border border-slate-700">
+              <span class="text-[9px] text-slate-400 block">Snapper</span>
+              <span class="text-xs font-extrabold text-white">30 Kg</span>
+            </div>
+          </div>
+
+          <!-- Instant Action Row inside banner -->
+          <div class="flex space-x-2 pt-1">
+            <button onclick="handleOrderAction('accept')" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] py-2 rounded-lg shadow flex items-center justify-center space-x-1">
+              <i class="fa-solid fa-check"></i>
+              <span>Mark Ready</span>
+            </button>
+            <button onclick="openReduceQtyModal()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[10px] py-2 rounded-lg shadow flex items-center justify-center space-x-1">
+              <i class="fa-solid fa-sliders"></i>
+              <span>Adjust Qty</span>
+            </button>
+            <button onclick="openRejectOrderModal()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] py-2 rounded-lg shadow flex items-center justify-center space-x-1">
+              <i class="fa-solid fa-xmark"></i>
+              <span>Reject</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Fixed Mobile Bottom Section Navigation Bar -->
+    <nav class="bg-white border-t border-slate-200 px-1 py-1 flex justify-around items-center z-30 shrink-0 shadow-lg h-[60px]">
+      <button onclick="showTab('tiering')" id="nav-btn-tiering" class="nav-item flex flex-col items-center justify-center text-liciousRed transition-colors py-1 px-1.5">
+        <i class="fa-solid fa-trophy text-sm"></i>
+        <span class="text-[9px] font-bold mt-0.5">Score</span>
+      </button>
+
+      <button onclick="showTab('incentive')" id="nav-btn-incentive" class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-liciousRed transition-colors py-1 px-1.5">
+        <i class="fa-solid fa-indian-rupee-sign text-sm"></i>
+        <span class="text-[9px] font-medium mt-0.5">Bonus</span>
+      </button>
+
+      <button onclick="showTab('logging')" id="nav-btn-logging" class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-liciousRed transition-colors py-1 px-1.5">
+        <i class="fa-solid fa-clipboard-list text-sm"></i>
+        <span class="text-[9px] font-medium mt-0.5">Entry</span>
+      </button>
+
+      <button onclick="showTab('grading')" id="nav-btn-grading" class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-liciousRed transition-colors py-1 px-1.5">
+        <i class="fa-solid fa-fish text-sm"></i>
+        <span class="text-[9px] font-medium mt-0.5">Grading</span>
+      </button>
+
+      <button onclick="showTab('feedback')" id="nav-btn-feedback" class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-liciousRed transition-colors py-1 px-1.5">
+        <i class="fa-solid fa-star text-sm"></i>
+        <span class="text-[9px] font-medium mt-0.5">NPS</span>
+      </button>
+
+      <button onclick="showTab('orders')" id="nav-btn-orders" class="nav-item flex flex-col items-center justify-center text-slate-400 hover:text-liciousRed transition-colors py-1 px-1.5 relative">
+        <span class="absolute top-1 right-2 w-2 h-2 bg-liciousRed rounded-full"></span>
+        <i class="fa-solid fa-box-open text-sm"></i>
+        <span class="text-[9px] font-medium mt-0.5">Orders</span>
+      </button>
+    </nav>
+
+
+    <!-- ================= MODALS & POPUPS ================= -->
+
+    <!-- MODAL 1: SCORE TO TIER MATRIX (i Button) -->
+    <div id="tierInfoModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+      <div class="bg-white w-full max-w-[400px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-trophy text-amber-500"></i>
+            <h3 class="text-sm font-extrabold text-slate-800">Score to Tier Matrix</h3>
+          </div>
+          <button onclick="closeTierInfoModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-500">
+          Calculated weekly every Sunday night based on your composite sourcing performance:
+        </p>
+
+        <div class="space-y-2 text-xs">
+          <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-200 flex justify-between items-center">
+            <div>
+              <span class="font-black text-amber-800 block">Gold Tier</span>
+              <span class="text-[10px] text-amber-600">Priority dock slot + 1.5x bonus rate</span>
+            </div>
+            <span class="font-black text-amber-700">85+ Score</span>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-slate-100 border border-slate-200 flex justify-between items-center">
+            <div>
+              <span class="font-bold text-slate-700 block">Silver Tier</span>
+              <span class="text-[10px] text-slate-500">Standard dock slot + 1.0x bonus rate</span>
+            </div>
+            <span class="font-bold text-slate-600">70 - 84 Score</span>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-orange-50 border border-orange-200 flex justify-between items-center">
+            <div>
+              <span class="font-bold text-orange-800 block">Bronze Tier</span>
+              <span class="text-[10px] text-orange-600">Regular dock slot</span>
+            </div>
+            <span class="font-bold text-orange-700">55 - 69 Score</span>
+          </div>
+
+          <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-200 flex justify-between items-center">
+            <div>
+              <span class="font-bold text-rose-800 block">Iron Tier</span>
+              <span class="text-[10px] text-rose-600">Dock audit review required</span>
+            </div>
+            <span class="font-bold text-rose-700">&lt; 55 Score</span>
+          </div>
+        </div>
+
+        <button onclick="closeTierInfoModal()" class="w-full bg-liciousRed hover:bg-liciousRedDark text-white font-bold text-xs py-2.5 rounded-xl shadow">
+          Understood
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 2: HOW BONUSES WORK (i Button) -->
+    <div id="bonusInfoModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+      <div class="bg-white w-full max-w-[400px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-indian-rupee-sign text-emerald-600"></i>
+            <h3 class="text-sm font-extrabold text-slate-800">How Weekly Bonuses Work</h3>
+          </div>
+          <button onclick="closeBonusInfoModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="space-y-2.5 text-xs">
+          <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+            <h4 class="font-bold text-slate-800 flex items-center space-x-1.5">
+              <i class="fa-solid fa-truck-fast text-emerald-600"></i>
+              <span>1. On-Time Dock Delivery Slot</span>
+            </h4>
+            <p class="text-[10px] text-slate-500 mt-0.5">Arrive within ±15 mins of assigned dock unloading slot.</p>
+          </div>
+
+          <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+            <h4 class="font-bold text-slate-800 flex items-center space-x-1.5">
+              <i class="fa-solid fa-fish text-blue-600"></i>
+              <span>2. Promised vs Delivered Grade Match</span>
+            </h4>
+            <p class="text-[10px] text-slate-500 mt-0.5">0% mismatch between your logged catch grade & QC audit.</p>
+          </div>
+
+          <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+            <h4 class="font-bold text-slate-800 flex items-center space-x-1.5">
+              <i class="fa-solid fa-chart-line text-indigo-600"></i>
+              <span>3. Fill Rate Accuracy Target</span>
+            </h4>
+            <p class="text-[10px] text-slate-500 mt-0.5">Deliver 100% of confirmed SKU quantities in order dispatch.</p>
+          </div>
+        </div>
+
+        <button onclick="closeBonusInfoModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 rounded-xl shadow">
+          Close Guide
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 3: DETAILED SCORE ATTRIBUTE BREAKDOWN -->
+    <div id="scoreDetailModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+      <div class="bg-white w-full max-w-[400px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+          <h3 id="scoreDetailTitle" class="text-sm font-extrabold text-slate-800">Attribute Detail</h3>
+          <button onclick="closeScoreDetailModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200/80 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-500">Current Score:</span>
+            <span id="scoreDetailValue" class="text-xl font-black text-emerald-600">92/100</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-500">Sub-Weightage:</span>
+            <span id="scoreDetailWeight" class="text-xs font-bold text-slate-800">20%</span>
+          </div>
+        </div>
+
+        <div class="space-y-2 text-xs text-slate-600">
+          <p class="font-bold text-slate-800">Benchmark Calculation:</p>
+          <p id="scoreDetailLogic" class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-[11px]">
+            Details...
+          </p>
+
+          <p class="font-bold text-slate-800 mt-2">Dock Audit Log:</p>
+          <p id="scoreDetailAudit" class="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-[11px]">
+            Audit details...
+          </p>
+        </div>
+
+        <button onclick="closeScoreDetailModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2.5 rounded-xl shadow">
+          Close Breakdown
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 4: 3 GRADING MISMATCHES DETAILED POPUP -->
+    <div id="mismatchModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+      <div class="bg-white w-full max-w-[400px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+            <h3 class="text-sm font-extrabold text-slate-800">Last Week Mismatches (3)</h3>
+          </div>
+          <button onclick="closeMismatchModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="space-y-2.5 text-xs">
+          <!-- Instance 1 -->
+          <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl space-y-1">
+            <div class="flex justify-between font-bold text-rose-900">
+              <span>Red Snapper (Batch #881)</span>
+              <span class="text-[10px] text-slate-500">Sep 18</span>
+            </div>
+            <p class="text-[11px] text-slate-700">Promised: <strong>Grade A+</strong> | Dock Inspected: <strong>Grade A</strong></p>
+            <p class="text-[10px] text-rose-700">Reason: Ice melt recorded; core temperature reached 3.4°C (&lt;1.5°C required for A+).</p>
+          </div>
+
+          <!-- Instance 2 -->
+          <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl space-y-1">
+            <div class="flex justify-between font-bold text-rose-900">
+              <span>Kingfish / Surmai (Batch #874)</span>
+              <span class="text-[10px] text-slate-500">Sep 16</span>
+            </div>
+            <p class="text-[11px] text-slate-700">Promised: <strong>Grade A</strong> | Dock Inspected: <strong>Grade B</strong></p>
+            <p class="text-[10px] text-rose-700">Reason: Minor skin loss and belly soft spot detected on 12% of crate.</p>
+          </div>
+
+          <!-- Instance 3 -->
+          <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl space-y-1">
+            <div class="flex justify-between font-bold text-rose-900">
+              <span>Silver Pomfret (Batch #862)</span>
+              <span class="text-[10px] text-slate-500">Sep 14</span>
+            </div>
+            <p class="text-[11px] text-slate-700">Promised: <strong>Grade A+</strong> | Dock Inspected: <strong>Grade A</strong></p>
+            <p class="text-[10px] text-rose-700">Reason: Partial scale abrasion from transport crate friction.</p>
+          </div>
+        </div>
+
+        <button onclick="closeMismatchModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs py-2.5 rounded-xl shadow">
+          Close Audit Logs
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 5: CSV UPLOAD & TEMPLATE DOWNLOAD SIMULATION -->
+    <div id="csvModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+      <div class="bg-white w-full max-w-[400px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+          <h3 class="text-sm font-extrabold text-slate-800">CSV Catch Log Import</h3>
+          <button onclick="closeCSVModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="border-2 border-dashed border-slate-300 rounded-2xl p-5 text-center space-y-2 bg-slate-50">
+          <i class="fa-solid fa-file-csv text-3xl text-liciousRed"></i>
+          <p class="text-xs font-bold text-slate-800">Upload Daily Catch CSV File</p>
+          <p class="text-[10px] text-slate-400">Columns: Fish_SKU, Grade, Quantity_KG</p>
+          
+          <div class="flex justify-center space-x-2 pt-2">
+            <button onclick="downloadCSVTemplate()" class="bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-slate-300">
+              Download Template
+            </button>
+            <button onclick="simulateCSVImport()" class="bg-liciousRed text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow hover:bg-liciousRedDark">
+              Parse Sample CSV
+            </button>
+          </div>
+        </div>
+
+        <button onclick="closeCSVModal()" class="w-full bg-slate-100 text-slate-600 font-bold text-xs py-2 rounded-xl">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 6: REDUCE / ADJUST ORDER QUANTITY -->
+    <div id="reduceQtyModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+      <div class="bg-white w-full max-w-[400px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+          <h3 class="text-sm font-extrabold text-slate-800">Adjust SKU Quantities</h3>
+          <button onclick="closeReduceQtyModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-700">Kingfish (Surmai)</span>
+              <span id="surmaiVal" class="text-liciousRed">40 kg (Promised 50)</span>
+            </div>
+            <input type="range" min="10" max="50" value="40" oninput="document.getElementById('surmaiVal').innerText = this.value + ' kg (Promised 50)'" class="w-full accent-liciousRed">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-700">Silver Pomfret</span>
+              <span id="pomfretVal" class="text-liciousRed">35 kg (Promised 40)</span>
+            </div>
+            <input type="range" min="10" max="40" value="35" oninput="document.getElementById('pomfretVal').innerText = this.value + ' kg (Promised 40)'" class="w-full accent-liciousRed">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-700">Red Snapper</span>
+              <span id="snapperVal" class="text-liciousRed">25 kg (Promised 30)</span>
+            </div>
+            <input type="range" min="10" max="30" value="25" oninput="document.getElementById('snapperVal').innerText = this.value + ' kg (Promised 30)'" class="w-full accent-liciousRed">
+          </div>
+
+          <div>
+            <label class="text-[10px] font-bold text-slate-500 uppercase block mb-1">Reason for Shortfall:</label>
+            <select class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800">
+              <option>Boat returned early due to high tide</option>
+              <option>Auction volume lower than expected</option>
+              <option>Ice preservation limit reached on deck</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="confirmReduceQty()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2.5 rounded-xl shadow">
+          Confirm Adjusted Dispatch
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 7: REJECT ORDER -->
+    <div id="rejectOrderModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+      <div class="bg-white w-full max-w-[400px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+          <h3 class="text-sm font-extrabold text-slate-800">Reject Order #FO-9821</h3>
+          <button onclick="closeRejectOrderModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-500">Select reason for order rejection:</p>
+
+        <div class="space-y-2 text-xs">
+          <label class="flex items-center space-x-2 p-2.5 bg-slate-50 rounded-xl cursor-pointer">
+            <input type="radio" name="rejectReason" class="text-liciousRed" checked>
+            <span class="font-bold text-slate-700">Weather delay at sea / Rough ocean warning</span>
+          </label>
+          <label class="flex items-center space-x-2 p-2.5 bg-slate-50 rounded-xl cursor-pointer">
+            <input type="radio" name="rejectReason" class="text-liciousRed">
+            <span class="font-bold text-slate-700">Boat dock landing delay</span>
+          </label>
+          <label class="flex items-center space-x-2 p-2.5 bg-slate-50 rounded-xl cursor-pointer">
+            <input type="radio" name="rejectReason" class="text-liciousRed">
+            <span class="font-bold text-slate-700">Out of stock / Fish catch sold out</span>
+          </label>
+        </div>
+
+        <button onclick="confirmOrderReject()" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs py-2.5 rounded-xl shadow">
+          Submit Rejection
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 8: PROFILE DRAWER -->
+    <div id="profileModal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 backdrop-blur-sm">
+      <div class="bg-white w-full max-w-[400px] rounded-t-3xl sm:rounded-3xl p-5 space-y-4">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+          <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-full bg-slate-900 text-white font-black flex items-center justify-center text-lg shadow">
+              S
+            </div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-800">Seawater Catch Marine Co.</h3>
+              <p class="text-[11px] text-liciousRed font-bold">Licious Gold Verified Supplier</p>
+            </div>
+          </div>
+          <button onclick="toggleProfileModal()" class="text-slate-400 hover:text-slate-700 text-lg">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between p-2 bg-slate-50 rounded-xl">
+            <span class="text-slate-500">Supplier ID:</span>
+            <span class="font-mono font-bold text-slate-800">#LIC-SEA-908</span>
+          </div>
+          <div class="flex justify-between p-2 bg-slate-50 rounded-xl">
+            <span class="text-slate-500">Primary Hub:</span>
+            <span class="font-bold text-slate-800">Vizag Dock #4</span>
+          </div>
+          <div class="flex justify-between p-2 bg-slate-50 rounded-xl">
+            <span class="text-slate-500">Tier Status:</span>
+            <span class="text-emerald-600 font-bold">Gold Tier (Score 88)</span>
+          </div>
+        </div>
+
+        <button onclick="toggleProfileModal()" class="w-full bg-slate-800 text-white font-bold text-xs py-2.5 rounded-xl">
+          Close Profile
+        </button>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastMessage" class="fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl hidden z-50 flex items-center space-x-2 border border-slate-700">
+      <i class="fa-solid fa-circle-check text-emerald-400"></i>
+      <span id="toastText">Action completed successfully</span>
+    </div>
+
+  </div>
+
+  <script>
+    // Tab State Management
+    let currentTab = 'tiering';
+    let bannerExpanded = false;
+
+    // SKU Dynamic Questions Mapping
+    const skuQuestionsMap = {
+      'Kingfish': [
+        { id: 'q1', label: '1. Gill Color & Freshness', options: ['Bright Crimson Red (A+)', 'Pinkish Red (A)', 'Pale Brown (B)'] },
+        { id: 'q2', label: '2. Tail & Cut Firmness', options: ['Extremely Firm, Springs Back (A+)', 'Slight Softness (A)', 'Soft Cut (B)'] },
+        { id: 'q3', label: '3. Eye Clarity', options: ['Bulging & Crystal Clear (A+)', 'Flat / Slightly Hazy (A)', 'Cloudy (B)'] },
+        { id: 'q4', label: '4. Belly Slit Integrity', options: ['Completely Intact (A+)', 'Slight Elasticity Loss (A)', 'Belly Soft (B)'] },
+        { id: 'q5', label: '5. Core Ice Temperature', options: ['< 1.5°C (A+)', '1.5°C - 2.5°C (A)', '> 2.5°C (B)'] }
+      ],
+      'Silver Pomfret': [
+        { id: 'q1', label: '1. Metallic Skin Luster', options: ['95%+ Metallic Silvery Sheen (A+)', '80% Silvery Sheen (A)', 'Dull Skin (B)'] },
+        { id: 'q2', label: '2. Slime & Skin Coating', options: ['Clear Natural Slime (A+)', 'Slight Slime Loss (A)', 'Sticky / Cloudy Slime (B)'] },
+        { id: 'q3', label: '3. Gill Freshness', options: ['Bright Crimson Red (A+)', 'Pinkish (A)', 'Dark Pink (B)'] },
+        { id: 'q4', label: '4. Flesh Springiness', options: ['Immediate Elastic Bounce (A+)', 'Moderate Bounce (A)', 'Indentation Stays (B)'] },
+        { id: 'q5', label: '5. Core Ice Temp', options: ['< 1.5°C (A+)', '1.5°C - 2.5°C (A)', '> 2.5°C (B)'] }
+      ],
+      'Red Snapper': [
+        { id: 'q1', label: '1. Scarlet Scale Gloss', options: ['Vibrant Glossy Red (A+)', 'Slight Color Fading (A)', 'Dull Pale Red (B)'] },
+        { id: 'q2', label: '2. Gill Color & Odor', options: ['Deep Red, Clean Sea Odor (A+)', 'Pinkish, Mild Odor (A)', 'Brownish (B)'] },
+        { id: 'q3', label: '3. Fin & Tail Integrity', options: ['Fins Intact & Unbroken (A+)', 'Minor Fin Splits (A)', 'Damaged Fins (B)'] },
+        { id: 'q4', label: '4. Eye Plumpness', options: ['Convex & Translucent (A+)', 'Flat (A)', 'Sunken (B)'] },
+        { id: 'q5', label: '5. Core Ice Temp', options: ['< 1.5°C (A+)', '1.5°C - 2.5°C (A)', '> 2.5°C (B)'] }
+      ]
+    };
+
+    // DOM Ready Initialization
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSkuQuestions();
+      startOrderTimer();
+    });
+
+    // Tab Switching Function
+    function showTab(tabId) {
+      currentTab = tabId;
+
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+
+      // Show selected tab
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove('hidden');
+
+      // Update Bottom Navigation Styling
+      document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.classList.remove('text-liciousRed');
+        btn.classList.add('text-slate-400');
+      });
+
+      const activeNavBtn = document.getElementById(`nav-btn-${tabId}`);
+      if (activeNavBtn) {
+        activeNavBtn.classList.remove('text-slate-400');
+        activeNavBtn.classList.add('text-liciousRed');
+      }
+
+      // Scroll smoothly to top
+      document.getElementById('mainScrollContainer').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Persistent Live Order Floating Banner Toggle Logic
+    function toggleOrderBanner() {
+      bannerExpanded = !bannerExpanded;
+      const content = document.getElementById('bannerExpandedContent');
+      const chevron = document.getElementById('bannerToggleChevron');
+
+      if (bannerExpanded) {
+        content.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+      } else {
+        content.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+      }
+    }
+
+    // Modal Control Handlers
+    function toggleProfileModal() {
+      document.getElementById('profileModal').classList.toggle('hidden');
+    }
+
+    function openTierInfoModal() {
+      document.getElementById('tierInfoModal').classList.remove('hidden');
+    }
+
+    function closeTierInfoModal() {
+      document.getElementById('tierInfoModal').classList.add('hidden');
+    }
+
+    function openBonusInfoModal() {
+      document.getElementById('bonusInfoModal').classList.remove('hidden');
+    }
+
+    function closeBonusInfoModal() {
+      document.getElementById('bonusInfoModal').classList.add('hidden');
+    }
+
+    function openMismatchModal() {
+      document.getElementById('mismatchModal').classList.remove('hidden');
+    }
+
+    function closeMismatchModal() {
+      document.getElementById('mismatchModal').classList.add('hidden');
+    }
+
+    function openCSVModal() {
+      document.getElementById('csvModal').classList.remove('hidden');
+    }
+
+    function closeCSVModal() {
+      document.getElementById('csvModal').classList.add('hidden');
+    }
+
+    function openReduceQtyModal() {
+      document.getElementById('reduceQtyModal').classList.remove('hidden');
+    }
+
+    function closeReduceQtyModal() {
+      document.getElementById('reduceQtyModal').classList.add('hidden');
+    }
+
+    function openRejectOrderModal() {
+      document.getElementById('rejectOrderModal').classList.remove('hidden');
+    }
+
+    function closeRejectOrderModal() {
+      document.getElementById('rejectOrderModal').classList.add('hidden');
+    }
+
+    // Sub-attribute Detail Modal Logic
+    function openScoreDetail(title, score, weight, logic, audit) {
+      document.getElementById('scoreDetailTitle').innerText = `${title} Breakdown`;
+      document.getElementById('scoreDetailValue').innerText = `${score}/100`;
+      document.getElementById('scoreDetailWeight').innerText = weight;
+      document.getElementById('scoreDetailLogic').innerText = logic;
+      document.getElementById('scoreDetailAudit').innerText = audit;
+
+      document.getElementById('scoreDetailModal').classList.remove('hidden');
+    }
+
+    function closeScoreDetailModal() {
+      document.getElementById('scoreDetailModal').classList.add('hidden');
+    }
+
+    // Dynamic Catch Log Form Logic
+    function addCatchRow() {
+      const container = document.getElementById('catchRowsContainer');
+      const newRow = document.createElement('div');
+      newRow.className = 'catch-row grid grid-cols-12 gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 items-center animate-in fade-in duration-200';
+      newRow.innerHTML = `
+        <div class="col-span-5">
+          <label class="text-[9px] font-bold text-slate-500 uppercase block mb-0.5">Fish SKU</label>
+          <select class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-liciousRed">
+            <option value="Kingfish / Surmai">Kingfish (Surmai)</option>
+            <option value="Silver Pomfret">Silver Pomfret</option>
+            <option value="Red Snapper">Red Snapper</option>
+            <option value="Yellowfin Tuna">Yellowfin Tuna</option>
+            <option value="Asian Sea Bass">Asian Sea Bass</option>
+          </select>
+        </div>
+        <div class="col-span-4">
+          <label class="text-[9px] font-bold text-slate-500 uppercase block mb-0.5">Grade</label>
+          <select class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-liciousRed">
+            <option value="Grade A+">Grade A+ (Export)</option>
+            <option value="Grade A">Grade A (Prime)</option>
+            <option value="Grade B">Grade B (Fresh)</option>
+          </select>
+        </div>
+        <div class="col-span-3 relative">
+          <label class="text-[9px] font-bold text-slate-500 uppercase block mb-0.5">Qty (kg)</label>
+          <input type="number" placeholder="Kgs" value="40" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-black text-slate-800 focus:outline-none focus:border-liciousRed">
+          <button type="button" onclick="this.closest('.catch-row').remove()" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center">×</button>
+        </div>
+      `;
+      container.appendChild(newRow);
+    }
+
+    function triggerCameraSimulation() {
+      document.getElementById('photoPreviewBox').classList.remove('hidden');
+      showToast('Catch Photo Attached & GPS Tagged!');
+    }
+
+    function removeCatchPhoto() {
+      document.getElementById('photoPreviewBox').classList.add('hidden');
+    }
+
+    function simulateVoiceDictation() {
+      showToast('🎤 Voice Recognized: "Added 50kg Surmai Grade A"');
+    }
+
+    function downloadCSVTemplate() {
+      showToast('Downloaded Licious_Catch_Template.csv');
+    }
+
+    function simulateCSVImport() {
+      closeCSVModal();
+      showToast('Parsed 3 rows from CSV successfully!');
+    }
+
+    function handleCatchLogSubmit(e) {
+      e.preventDefault();
+      showToast('Availability catch log submitted!');
+    }
+
+    // Dynamic SKU Grading Questionnaire Renderer
+    function renderSkuQuestions() {
+      const selectedSku = document.getElementById('gradingSkuSelect').value;
+      const container = document.getElementById('dynamicQuestionsBox');
+      const questions = skuQuestionsMap[selectedSku] || skuQuestionsMap['Kingfish'];
+
+      container.innerHTML = '';
+
+      questions.forEach((q) => {
+        const qDiv = document.createElement('div');
+        qDiv.className = 'space-y-1';
+
+        let opts = '';
+        q.options.forEach((opt, idx) => {
+          opts += `
+            <label class="flex items-center space-x-2 text-[11px] font-medium text-slate-700 bg-slate-50 p-2 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100">
+              <input type="radio" name="${q.id}" value="${idx}" ${idx === 0 ? 'checked' : ''} class="text-liciousRed focus:ring-liciousRed">
+              <span>${opt}</span>
+            </label>
+          `;
+        });
+
+        qDiv.innerHTML = `
+          <label class="text-[11px] font-bold text-slate-800 block">${q.label}</label>
+          <div class="grid grid-cols-1 gap-1">
+            ${opts}
+          </div>
+        `;
+        container.appendChild(qDiv);
+      });
+
+      document.getElementById('gradeResultBox').classList.add('hidden');
+    }
+
+    function calculateGradeResult() {
+      const sku = document.getElementById('gradingSkuSelect').value;
+      const resultBox = document.getElementById('gradeResultBox');
+      const badge = document.getElementById('gradeResultBadge');
+      const notes = document.getElementById('gradeResultNotes');
+
+      badge.innerText = `ASSIGNED GRADE: GRADE A+ (${sku})`;
+      notes.innerText = '98% compliance match. Eligible for Gold Tier premium incentive bonus.';
+      resultBox.classList.remove('hidden');
+
+      showToast('Assigned Grade Calculated!');
+    }
+
+    // NPS & Feedback Handlers
+    function setStarRating(stars) {
+      const buttons = document.querySelectorAll('.star-btn');
+      buttons.forEach((btn, idx) => {
+        if (idx < stars) {
+          btn.classList.remove('text-slate-300');
+          btn.classList.add('text-amber-400');
+        } else {
+          btn.classList.remove('text-amber-400');
+          btn.classList.add('text-slate-300');
+        }
+      });
+      showToast(`Selected ${stars} Stars`);
+    }
+
+    function simulateVoiceFeedback() {
+      document.getElementById('feedbackComment').value = "Dock unloading slot timing was fast. Ice quality was excellent at Vizag!";
+      showToast('🎤 Voice comment transcribed!');
+    }
+
+    function submitSupplierFeedback() {
+      document.getElementById('feedbackStatusBadge').className = 'text-[10px] font-bold bg-slate-500 text-white px-2 py-0.5 rounded-full';
+      document.getElementById('feedbackStatusBadge').innerText = 'Feedback Submitted Today';
+      document.getElementById('feedbackSubmitBtn').disabled = true;
+      document.getElementById('feedbackSubmitBtn').classList.add('opacity-50');
+      showToast('Daily NPS Feedback Submitted!');
+    }
+
+    // Order Action Handlers
+    function handleOrderAction(action) {
+      if (action === 'accept') {
+        showToast('Order #FO-9821 Marked FULLY READY!');
+      }
+    }
+
+    function confirmReduceQty() {
+      closeReduceQtyModal();
+      showToast('Quantity adjusted & Order marked Ready!');
+    }
+
+    function confirmOrderReject() {
+      closeRejectOrderModal();
+      showToast('Order #FO-9821 Rejection Logged');
+    }
+
+    // Timer Countdown for Order
+    function startOrderTimer() {
+      let seconds = 872; // ~14m 32s
+      const timerDisplay = document.getElementById('orderTimerText');
+
+      setInterval(() => {
+        if (seconds > 0) {
+          seconds--;
+          const m = Math.floor(seconds / 60);
+          const s = seconds % 60;
+          if (timerDisplay) {
+            timerDisplay.innerText = `${m}m ${s < 10 ? '0' : ''}${s}s`;
+          }
+        }
+      }, 1000);
+    }
+
+    // Toast Message System
+    function showToast(message) {
+      const toast = document.getElementById('toastMessage');
+      const text = document.getElementById('toastText');
+      text.innerText = message;
+      toast.classList.remove('hidden');
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
