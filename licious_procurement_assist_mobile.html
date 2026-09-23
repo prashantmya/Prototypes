@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Licious Procurement Assist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        licious: {
+                            emerald: '#004C33',
+                            dark: '#003322',
+                            mint: '#10B981',
+                            accent: '#00A86B',
+                            light: '#E6F4EE',
+                            subtle: '#F2F9F5',
+                            red: '#E11D48',
+                            amber: '#F59E0B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background-color: #F8FAFC;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+        .pulse-emerald {
+            animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.15); }
+        }
+        .toast-slide {
+            animation: slideDown 0.3s ease-out forwards;
+        }
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-800">
+    <div class="app-container flex flex-col justify-between pb-20">
+        
+        <!-- TOP HEADER & BRANDING BAR -->
+        <header class="bg-licious-emerald text-white sticky top-0 z-30 shadow-md px-4 py-3 border-b border-licious-dark/30">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center font-black text-emerald-300 text-lg tracking-tighter border border-white/20">
+                        L
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base leading-tight tracking-tight">ProcureAssist <span class="text-emerald-300 font-normal text-xs px-1.5 py-0.5 rounded bg-emerald-950/60 ml-1">MOBILE</span></h1>
+                        <p class="text-[10px] text-emerald-200/80 font-medium">Seawater Fish Procurement</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <!-- AM Live Status Badge -->
+                    <div class="flex items-center gap-1.5 bg-emerald-950/60 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-emerald"></span>
+                        <span class="text-[11px] font-semibold text-emerald-200 tracking-wide">AM Live</span>
+                    </div>
+                    <!-- Date Picker Toggle Button -->
+                    <button id="dateToggleBtn" onclick="toggleDatePickerModal()" class="touch-target px-2.5 py-1.5 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-lg text-xs font-medium text-emerald-100 flex items-center gap-1.5 transition">
+                        <i class="fa-regular fa-calendar text-emerald-300"></i>
+                        <span id="currentDateDisplay">24 Sep</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- TOAST CONTAINER FOR NOTIFICATIONS -->
+        <div id="toastContainer" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-[460px] pointer-events-none"></div>
+
+        <!-- MAIN VIEW PORT (CONTAINER FOR 5 SECTIONS) -->
+        <main class="flex-1 p-3.5 space-y-4">
+
+            <!-- SECTION 1: AM PERFORMANCE DASHBOARD -->
+            <section id="sec-am-perf" class="space-y-3.5">
+                <!-- Timeframe Filter Pills -->
+                <div class="flex items-center justify-between bg-white p-1 rounded-xl shadow-sm border border-slate-200/80">
+                    <button onclick="setAMTimeframe('day')" id="tf-day" class="flex-1 py-2 rounded-lg text-xs font-semibold text-center transition bg-licious-emerald text-white shadow-sm">Day</button>
+                    <button onclick="setAMTimeframe('week')" id="tf-week" class="flex-1 py-2 rounded-lg text-xs font-semibold text-center text-slate-600 hover:bg-slate-100 transition">Week</button>
+                    <button onclick="setAMTimeframe('month')" id="tf-month" class="flex-1 py-2 rounded-lg text-xs font-semibold text-center text-slate-600 hover:bg-slate-100 transition">Month</button>
+                </div>
+
+                <!-- AM Health Score Card -->
+                <div class="bg-gradient-to-br from-licious-emerald to-licious-dark text-white p-4 rounded-2xl shadow-md relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-[11px] uppercase font-bold tracking-wider text-emerald-300/90">AM Overall Health Score</span>
+                            <div class="flex items-baseline gap-2 mt-0.5">
+                                <span id="healthScoreValue" class="text-3xl font-black text-white">94.2</span>
+                                <span class="text-xs text-emerald-200 font-medium">/ 100</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 mt-2 text-xs text-emerald-200 bg-white/10 px-2.5 py-1 rounded-lg w-fit">
+                                <i class="fa-solid fa-arrow-trend-up text-emerald-400"></i>
+                                <span>+1.8% vs last cycle</span>
+                            </div>
+                        </div>
+                        <div class="w-16 h-16 rounded-full border-4 border-emerald-400/30 border-t-emerald-400 flex items-center justify-center bg-emerald-950/40">
+                            <i class="fa-solid fa-shield-halved text-2xl text-emerald-300"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5 Core Metrics Cards -->
+                <div class="grid grid-cols-2 gap-2.5">
+                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div class="flex justify-between items-start text-slate-500">
+                            <span class="text-[11px] font-medium text-slate-500">Price Index</span>
+                            <i class="fa-solid fa-chart-line text-emerald-600 text-xs"></i>
+                        </div>
+                        <div class="mt-2">
+                            <span id="metricPriceIdx" class="text-xl font-bold text-slate-900">98.4%</span>
+                            <p class="text-[10px] text-emerald-600 font-medium flex items-center gap-0.5 mt-0.5">
+                                <i class="fa-solid fa-check"></i> Within target (&lt;100%)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div class="flex justify-between items-start text-slate-500">
+                            <span class="text-[11px] font-medium text-slate-500">Fill Rate %</span>
+                            <i class="fa-solid fa-boxes-packing text-emerald-600 text-xs"></i>
+                        </div>
+                        <div class="mt-2">
+                            <span id="metricFillRate" class="text-xl font-bold text-slate-900">96.8%</span>
+                            <p class="text-[10px] text-emerald-600 font-medium flex items-center gap-0.5 mt-0.5">
+                                <i class="fa-solid fa-caret-up"></i> Target 95%
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div class="flex justify-between items-start text-slate-500">
+                            <span class="text-[11px] font-medium text-slate-500">Quality Score %</span>
+                            <i class="fa-solid fa-award text-emerald-600 text-xs"></i>
+                        </div>
+                        <div class="mt-2">
+                            <span id="metricQuality" class="text-xl font-bold text-slate-900">98.1%</span>
+                            <p class="text-[10px] text-emerald-600 font-medium flex items-center gap-0.5 mt-0.5">
+                                <i class="fa-solid fa-circle-check"></i> Grade A compliance
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div class="flex justify-between items-start text-slate-500">
+                            <span class="text-[11px] font-medium text-slate-500">SKU Spread</span>
+                            <i class="fa-solid fa-fish text-emerald-600 text-xs"></i>
+                        </div>
+                        <div class="mt-2">
+                            <span id="metricSKUSpread" class="text-xl font-bold text-slate-900">14 Active</span>
+                            <p class="text-[10px] text-slate-500 font-medium mt-0.5">Seawater catalog</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-licious-emerald flex items-center justify-center font-bold text-lg">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500 font-medium block">Total Scale Fulfilled</span>
+                            <span id="metricScale" class="text-lg font-extrabold text-slate-900">4,850 kg</span>
+                        </div>
+                    </div>
+                    <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full">+420 kg today</span>
+                </div>
+
+                <!-- Regional Geography Breakdown -->
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-sm space-y-2.5">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Geography & Port Metrics</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-anchor text-licious-emerald"></i>
+                                <span class="font-semibold text-slate-800">Mangalore Landing Hub</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-bold text-slate-900">1,850 kg</span>
+                                <span class="text-[10px] text-emerald-600 font-medium block">98% Fill</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-anchor text-licious-emerald"></i>
+                                <span class="font-semibold text-slate-800">Kochi Harbor</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-bold text-slate-900">1,420 kg</span>
+                                <span class="text-[10px] text-emerald-600 font-medium block">96% Fill</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-anchor text-licious-emerald"></i>
+                                <span class="font-semibold text-slate-800">Vizag Deep Port</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="font-bold text-slate-900">980 kg</span>
+                                <span class="text-[10px] text-amber-600 font-medium block">92% Fill</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Supplier-Level Performance Drilldown List -->
+                <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Supplier Drilldown</h3>
+                        <input type="text" id="suppSearchPerf" oninput="renderSupplierPerfList()" placeholder="Filter supplier..." class="text-xs px-2.5 py-1 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-licious-emerald w-32">
+                    </div>
+                    <div id="supplierPerfList" class="space-y-2">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: SUPPLIER INPUT -->
+            <section id="sec-supp-input" class="space-y-3.5 hidden">
+                <!-- Direct Entry Form Card -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-licious-emerald"></i>
+                            Direct Entry Form
+                        </h2>
+                        <button onclick="openBulkCSVModal()" class="touch-target px-2.5 py-1 bg-emerald-50 text-licious-emerald text-xs font-bold rounded-lg hover:bg-emerald-100 transition flex items-center gap-1 border border-emerald-200">
+                            <i class="fa-solid fa-file-csv"></i> Bulk CSV
+                        </button>
+                    </div>
+
+                    <form id="directEntryForm" onsubmit="handleDirectEntrySubmit(event)" class="space-y-3 text-xs">
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Supplier Name</label>
+                            <select id="deSupplier" required class="touch-target w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-licious-emerald/40 bg-slate-50">
+                                <option value="">Select Supplier</option>
+                                <option value="Coastline Catch Ltd">Coastline Catch Ltd</option>
+                                <option value="Ocean Fresh Co">Ocean Fresh Co</option>
+                                <option value="Malpe Marine Traders">Malpe Marine Traders</option>
+                                <option value="Sagar Fisheries">Sagar Fisheries</option>
+                                <option value="SeaKing Catch">SeaKing Catch</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Seawater Fish SKU</label>
+                            <select id="deSKU" required class="touch-target w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-licious-emerald/40 bg-slate-50">
+                                <option value="">Select SKU</option>
+                                <option value="King Fish / Surmai">King Fish / Surmai</option>
+                                <option value="Black Pomfret">Black Pomfret</option>
+                                <option value="White Pomfret">White Pomfret</option>
+                                <option value="Indian Salmon / Rawas">Indian Salmon / Rawas</option>
+                                <option value="Red Snapper">Red Snapper</option>
+                                <option value="Yellowfin Tuna">Yellowfin Tuna</option>
+                                <option value="Seer Fish">Seer Fish</option>
+                                <option value="Mackerel / Bangda">Mackerel / Bangda</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-slate-600 font-semibold mb-1">Grade</label>
+                                <select id="deGrade" required class="touch-target w-full px-2 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-licious-emerald/40 bg-slate-50">
+                                    <option value="Grade A">Grade A</option>
+                                    <option value="Grade B">Grade B</option>
+                                    <option value="Grade C">Grade C</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-600 font-semibold mb-1">Qty (kg)</label>
+                                <input type="number" id="deQty" min="1" placeholder="350" required class="touch-target w-full px-2.5 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-licious-emerald/40 bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-slate-600 font-semibold mb-1">Base Price (₹)</label>
+                                <input type="number" id="dePrice" min="1" placeholder="680" required class="touch-target w-full px-2.5 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-licious-emerald/40 bg-slate-50">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="touch-target w-full py-3 bg-licious-emerald hover:bg-licious-dark text-white font-bold rounded-xl shadow-md transition flex items-center justify-center gap-2 active:scale-[0.98]">
+                            <i class="fa-solid fa-plus-circle"></i> Submit Availability
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Supplier SEH Status Lists -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <h2 class="text-sm font-bold text-slate-900">Supplier Enablement Hub (SEH)</h2>
+                        <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold">Live Track</span>
+                    </div>
+
+                    <!-- Tabs: Submitted vs Pending -->
+                    <div class="flex rounded-lg bg-slate-100 p-1 text-xs">
+                        <button onclick="setSEHTab('submitted')" id="sehTabSubmitted" class="flex-1 py-1.5 font-bold rounded-md bg-white text-slate-800 shadow-sm">Submitted (3)</button>
+                        <button onclick="setSEHTab('pending')" id="sehTabPending" class="flex-1 py-1.5 font-bold rounded-md text-slate-500 hover:text-slate-800">Pending (2)</button>
+                    </div>
+
+                    <div id="sehSupplierList" class="space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Supplier x SKU Red Flagging Section -->
+                <div class="bg-white p-4 rounded-xl border border-rose-200 shadow-sm space-y-3">
+                    <div class="flex items-start gap-2.5 bg-rose-50 p-2.5 rounded-xl border border-rose-100 text-rose-800 text-xs">
+                        <i class="fa-solid fa-triangle-exclamation text-rose-600 mt-0.5 text-sm"></i>
+                        <div>
+                            <span class="font-bold block">Red Flag Exclusion Policy</span>
+                            <p class="text-[11px] text-rose-700/90 mt-0.5">Red-flagged Supplier x SKU pairs automatically receive 0 orders and are strictly excluded from order matching.</p>
+                        </div>
+                    </div>
+
+                    <form onsubmit="handleAddRedFlag(event)" class="space-y-2 text-xs">
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="rfSupplier" required class="touch-target px-2.5 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50">
+                                <option value="">Select Supplier</option>
+                                <option value="Coastline Catch Ltd">Coastline Catch Ltd</option>
+                                <option value="Ocean Fresh Co">Ocean Fresh Co</option>
+                                <option value="Malpe Marine Traders">Malpe Marine Traders</option>
+                                <option value="Sagar Fisheries">Sagar Fisheries</option>
+                            </select>
+                            <select id="rfSKU" required class="touch-target px-2.5 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-rose-500 bg-slate-50">
+                                <option value="">Select SKU</option>
+                                <option value="King Fish / Surmai">King Fish / Surmai</option>
+                                <option value="White Pomfret">White Pomfret</option>
+                                <option value="Indian Salmon / Rawas">Indian Salmon / Rawas</option>
+                                <option value="Red Snapper">Red Snapper</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="touch-target w-full py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-ban"></i> Flag Pair for Zero Order Allocation
+                        </button>
+                    </form>
+
+                    <!-- Active Red Flags List -->
+                    <div class="space-y-2 pt-1 border-t border-slate-100">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Active Red Flags</span>
+                        <div id="redFlagList" class="space-y-1.5">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: LIVE BIDDING -->
+            <section id="sec-live-bidding" class="space-y-3.5 hidden">
+                <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-3.5 rounded-2xl shadow-md flex items-center justify-between">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-gavel text-amber-400"></i>
+                            <h2 class="text-sm font-bold">Live Bidding Stream</h2>
+                        </div>
+                        <p class="text-[11px] text-slate-300 mt-0.5">Real-time floor bids across Seawater SKUs</p>
+                    </div>
+                    <span id="biddingQueueBadge" class="bg-amber-500 text-slate-950 font-black text-xs px-2.5 py-1 rounded-full shadow-sm">4 Active Bids</span>
+                </div>
+
+                <!-- Cards Stream Container -->
+                <div id="biddingCardsStream" class="space-y-3">
+                    <!-- Cards auto-sorted: Manual approval breaches float to top -->
+                </div>
+            </section>
+
+            <!-- SECTION 4: PRICES & CEILINGS -->
+            <section id="sec-prices-ceilings" class="space-y-3.5 hidden">
+                <!-- Market Price Header -->
+                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm">
+                    <div>
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Live Market Visibility</h2>
+                        <p class="text-xs font-semibold text-slate-800">Seawater Fish Benchmark Cards</p>
+                    </div>
+                    <span class="text-[10px] bg-emerald-50 text-licious-emerald font-bold border border-emerald-200 px-2 py-0.5 rounded-md">8 SKUs Tracked</span>
+                </div>
+
+                <!-- 1 Card Per Seawater SKU Grid -->
+                <div id="marketPriceCardsGrid" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Ceiling Rule Manager Section -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-[#004C33] fa-sliders text-licious-emerald"></i>
+                            Ceiling Rule Manager
+                        </h2>
+                        <span class="text-[11px] text-slate-500">State Retained</span>
+                    </div>
+
+                    <form onsubmit="handleCreateCeilingRule(event)" class="space-y-2.5 text-xs">
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Supplier</label>
+                            <select id="crSupplier" class="touch-target w-full px-2.5 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-licious-emerald bg-slate-50">
+                                <option value="ALL">All Suppliers (Global Default)</option>
+                                <option value="Coastline Catch Ltd">Coastline Catch Ltd</option>
+                                <option value="Ocean Fresh Co">Ocean Fresh Co</option>
+                                <option value="Malpe Marine Traders">Malpe Marine Traders</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-slate-600 font-semibold mb-1">SKU</label>
+                                <select id="crSKU" class="touch-target w-full px-2 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-licious-emerald bg-slate-50">
+                                    <option value="ALL">All Seawater SKUs</option>
+                                    <option value="King Fish / Surmai">King Fish / Surmai</option>
+                                    <option value="Black Pomfret">Black Pomfret</option>
+                                    <option value="White Pomfret">White Pomfret</option>
+                                    <option value="Indian Salmon / Rawas">Indian Salmon / Rawas</option>
+                                    <option value="Red Snapper">Red Snapper</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-slate-600 font-semibold mb-1">Grade</label>
+                                <select id="crGrade" class="touch-target w-full px-2 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-licious-emerald bg-slate-50">
+                                    <option value="ALL">All Grades</option>
+                                    <option value="Grade A">Grade A</option>
+                                    <option value="Grade B">Grade B</option>
+                                    <option value="Grade C">Grade C</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-slate-600 font-semibold mb-1">Max Ceiling Tolerance % Over Base</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="crTolerance" min="0" max="50" step="0.5" value="5.0" required class="touch-target flex-1 px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-licious-emerald bg-slate-50">
+                                <span class="font-bold text-slate-700">%</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="touch-target w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Ceiling Tolerance Rule
+                        </button>
+                    </form>
+
+                    <!-- Configured Ceiling Rules Table -->
+                    <div class="space-y-2 pt-2 border-t border-slate-100">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Active Price Tolerance Rules</span>
+                        <div id="activeCeilingRulesList" class="space-y-1.5 text-xs">
+                            <!-- JS populated -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: SUPPLIER ACCEPTANCE & LOCK-IN -->
+            <section id="sec-supp-accept" class="space-y-3.5 hidden">
+                <div class="bg-white p-3 rounded-xl border border-slate-200/80 shadow-sm space-y-2">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Order Acceptance Status</h2>
+                    <!-- 3 Filter Tabs -->
+                    <div class="flex bg-slate-100 p-1 rounded-lg text-xs">
+                        <button onclick="setAcceptFilter('locked')" id="acceptTabLocked" class="flex-1 py-1.5 rounded-md font-bold bg-white text-slate-800 shadow-sm">Locked In (3)</button>
+                        <button onclick="setAcceptFilter('pending')" id="acceptTabPending" class="flex-1 py-1.5 rounded-md font-bold text-slate-500">Pending (2)</button>
+                        <button onclick="setAcceptFilter('no_avail')" id="acceptTabNoAvail" class="flex-1 py-1.5 rounded-md font-bold text-slate-500">No Avail (1)</button>
+                    </div>
+                </div>
+
+                <!-- Allocations List Container -->
+                <div id="supplierAcceptList" class="space-y-3">
+                    <!-- JS Populated Cards -->
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FIXED BOTTOM NAVIGATION BAR -->
+        <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[500px] bg-white border-t border-slate-200/90 z-40 px-2 py-1.5 shadow-lg">
+            <div class="grid grid-cols-5 gap-1 text-center">
+                
+                <button onclick="switchTab('am-perf')" id="nav-am-perf" class="touch-target flex flex-col items-center justify-center py-1 text-licious-emerald rounded-xl transition">
+                    <i class="fa-solid fa-chart-pie text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-bold">AM Perf</span>
+                </button>
+
+                <button onclick="switchTab('supp-input')" id="nav-supp-input" class="touch-target flex flex-col items-center justify-center py-1 text-slate-400 rounded-xl transition">
+                    <i class="fa-solid fa-file-signature text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Supp Input</span>
+                </button>
+
+                <button onclick="switchTab('live-bidding')" id="nav-live-bidding" class="touch-target flex flex-col items-center justify-center py-1 text-slate-400 rounded-xl relative transition">
+                    <div class="relative">
+                        <i class="fa-solid fa-gavel text-lg mb-0.5"></i>
+                        <span id="navBidBadge" class="absolute -top-1 -right-2 bg-rose-500 text-white font-bold text-[9px] w-4 h-4 rounded-full flex items-center justify-center">4</span>
+                    </div>
+                    <span class="text-[10px] font-semibold">Live Bid</span>
+                </button>
+
+                <button onclick="switchTab('prices-ceilings')" id="nav-prices-ceilings" class="touch-target flex flex-col items-center justify-center py-1 text-slate-400 rounded-xl transition">
+                    <i class="fa-solid fa-tags text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Prices</span>
+                </button>
+
+                <button onclick="switchTab('supp-accept')" id="nav-supp-accept" class="touch-target flex flex-col items-center justify-center py-1 text-slate-400 rounded-xl transition">
+                    <i class="fa-solid fa-circle-check text-lg mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Accept</span>
+                </button>
+
+            </div>
+        </nav>
+    </div>
+
+    <!-- MODAL 1: BULK CSV UPLOAD -->
+    <div id="bulkCSVModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 space-y-4 shadow-2xl border border-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-file-csv text-licious-emerald"></i> Bulk Supplier CSV Upload
+                </h3>
+                <button onclick="closeBulkCSVModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/50 rounded-xl p-6 text-center space-y-2">
+                <i class="fa-solid fa-cloud-arrow-up text-3xl text-licious-emerald"></i>
+                <p class="text-xs font-semibold text-slate-700">Drag & drop CSV file or tap to browse</p>
+                <p class="text-[10px] text-slate-400">Supported format: .csv (SKU, Grade, Qty, BasePrice)</p>
+                <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleCSVFileSelect(event)">
+                <button onclick="document.getElementById('csvFileInput').click()" class="touch-target px-4 py-2 bg-white text-licious-emerald font-bold text-xs rounded-lg border border-emerald-200 shadow-sm">
+                    Select File
+                </button>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+                <button onclick="downloadSampleCSV()" class="text-xs font-bold text-licious-emerald hover:underline flex items-center gap-1">
+                    <i class="fa-solid fa-download"></i> Sample CSV
+                </button>
+                <button onclick="processBulkCSV()" class="touch-target px-4 py-2 bg-licious-emerald text-white text-xs font-bold rounded-lg shadow">
+                    Process & Import
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: MARKET PRICE BREAKDOWN BY SUPPLIER -->
+    <div id="priceBreakdownModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-md rounded-2xl p-4 space-y-3 shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div>
+                    <h3 id="modalSKUTitle" class="font-bold text-slate-900 text-sm">King Fish / Surmai</h3>
+                    <p class="text-[10px] text-slate-500">Supplier Line Item Breakdown</p>
+                </div>
+                <button onclick="closePriceBreakdownModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto flex-1 space-y-2 text-xs" id="modalSupplierBreakdownList">
+                <!-- JS Populated -->
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                <button onclick="exportModalSKUCSV()" class="touch-target w-full py-2 bg-emerald-50 border border-emerald-200 text-licious-emerald font-bold text-xs rounded-xl hover:bg-emerald-100 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-file-excel"></i> Download SKU Breakdown CSV
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: OVERRIDE & ACCEPT ON BEHALF -->
+    <div id="overrideModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 space-y-3 shadow-2xl border border-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-user-gear text-licious-emerald"></i> AM Manual Override
+                </h3>
+                <button onclick="closeOverrideModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+
+            <div class="text-xs space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                <div class="flex justify-between text-slate-600">
+                    <span>Supplier:</span>
+                    <span id="ovSuppName" class="font-bold text-slate-900">Coastline Catch</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                    <span>SKU & Grade:</span>
+                    <span id="ovSKUGrade" class="font-bold text-slate-900">White Pomfret - Grade A</span>
+                </div>
+            </div>
+
+            <div class="space-y-1 text-xs">
+                <label class="block font-semibold text-slate-700">Adjust Accepted Quantity (kg)</label>
+                <input type="number" id="ovQtyInput" value="300" class="touch-target w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-licious-emerald bg-slate-50 font-bold text-sm">
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeOverrideModal()" class="flex-1 py-2 bg-slate-100 text-slate-700 font-bold text-xs rounded-xl">Cancel</button>
+                <button onclick="confirmAMOverride()" class="flex-1 py-2 bg-licious-emerald text-white font-bold text-xs rounded-xl shadow">Confirm & Lock-in</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* APP STATE DATA STRUCTURES */
+        let activeTab = 'am-perf';
+        let amTimeframe = 'day';
+        let sehTab = 'submitted';
+        let acceptFilter = 'locked';
+        let activeModalSKU = '';
+        let currentOverrideId = null;
+
+        // Seawater SKUs Benchmark List
+        const seawaterSKUs = [
+            'King Fish / Surmai',
+            'Black Pomfret',
+            'White Pomfret',
+            'Indian Salmon / Rawas',
+            'Red Snapper',
+            'Yellowfin Tuna',
+            'Seer Fish',
+            'Mackerel / Bangda'
+        ];
+
+        // Core Suppliers Dataset
+        let suppliers = [
+            { name: "Coastline Catch Ltd", fill: 98, quality: 99, lineItems: 42, onTime: "99%", sehStatus: "submitted", nudged: false },
+            { name: "Ocean Fresh Co", fill: 94, quality: 97, lineItems: 38, onTime: "95%", sehStatus: "pending", nudged: false },
+            { name: "Malpe Marine Traders", fill: 96, quality: 98, lineItems: 31, onTime: "97%", sehStatus: "submitted", nudged: false },
+            { name: "Sagar Fisheries", fill: 91, quality: 95, lineItems: 25, onTime: "92%", sehStatus: "pending", nudged: false },
+            { name: "SeaKing Catch", fill: 99, quality: 99, lineItems: 18, onTime: "100%", sehStatus: "submitted", nudged: false }
+        ];
+
+        // Red Flags
+        let redFlags = [
+            { id: 1, supplier: "Sagar Fisheries", sku: "White Pomfret", reason: "Quality discrepancy in temperature logs" }
+        ];
+
+        // Live Bidding Items (with timer seconds incrementing)
+        let biddingItems = [
+            {
+                id: 101,
+                sku: "King Fish / Surmai",
+                grade: "Grade A",
+                supplier: "Ocean Fresh Co",
+                bidPrice: 705,
+                ceilingPrice: 650,
+                qty: 400,
+                phone: "+919876543210",
+                isBreach: true,
+                breachPct: "+8.5%",
+                elapsedSec: 42,
+                noCeiling: false
+            },
+            {
+                id: 102,
+                sku: "Indian Salmon / Rawas",
+                grade: "Grade B",
+                supplier: "Sagar Fisheries",
+                bidPrice: 590,
+                ceilingPrice: null,
+                qty: 250,
+                phone: "+919876543211",
+                isBreach: false,
+                breachPct: null,
+                elapsedSec: 68,
+                noCeiling: true
+            },
+            {
+                id: 103,
+                sku: "White Pomfret",
+                grade: "Grade A",
+                supplier: "Coastline Catch Ltd",
+                bidPrice: 820,
+                ceilingPrice: 850,
+                qty: 300,
+                phone: "+919876543212",
+                isBreach: false,
+                breachPct: null,
+                elapsedSec: 15,
+                noCeiling: false
+            },
+            {
+                id: 104,
+                sku: "Red Snapper",
+                grade: "Grade A",
+                supplier: "Malpe Marine Traders",
+                bidPrice: 480,
+                ceilingPrice: 450,
+                qty: 500,
+                phone: "+919876543213",
+                isBreach: true,
+                breachPct: "+6.7%",
+                elapsedSec: 110,
+                noCeiling: false
+            }
+        ];
+
+        // Ceiling Rules
+        let ceilingRules = [
+            { id: 1, supplier: "ALL", sku: "ALL", grade: "ALL", tolerancePct: 5.0 },
+            { id: 2, supplier: "Coastline Catch Ltd", sku: "King Fish / Surmai", grade: "Grade A", tolerancePct: 8.0 }
+        ];
+
+        // Supplier Acceptance Allocations
+        let allocations = [
+            { id: 201, supplier: "Coastline Catch Ltd", sku: "King Fish / Surmai", grade: "Grade A", qty: 450, price: 650, status: "locked", tag: "Accepted via Supplier Portal" },
+            { id: 202, supplier: "Malpe Marine Traders", sku: "Black Pomfret", grade: "Grade B", qty: 300, price: 420, status: "locked", tag: "Accepted via Supplier Portal" },
+            { id: 203, supplier: "SeaKing Catch", sku: "Mackerel / Bangda", grade: "Grade A", qty: 600, price: 180, status: "locked", tag: "Accepted via Supplier Portal" },
+            { id: 204, supplier: "Ocean Fresh Co", sku: "White Pomfret", grade: "Grade A", qty: 350, price: 820, status: "pending", tag: "Pending Acceptance" },
+            { id: 205, supplier: "Sagar Fisheries", sku: "Yellowfin Tuna", grade: "Grade B", qty: 200, price: 340, status: "pending", tag: "Pending Acceptance" },
+            { id: 206, supplier: "Coastal Marine", sku: "Seer Fish", grade: "Grade C", qty: 0, price: 0, status: "no_avail", tag: "No Supply Available" }
+        ];
+
+        /* INITIALIZATION */
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAMDashboard();
+            renderSupplierPerfList();
+            renderSEHList();
+            renderRedFlags();
+            renderLiveBiddingStream();
+            renderMarketPriceCards();
+            renderCeilingRules();
+            renderSupplierAcceptList();
+
+            // Start Live Bidding Elapsed Timer
+            setInterval(() => {
+                biddingItems.forEach(item => item.elapsedSec++);
+                renderLiveBiddingStream();
+            }, 1000);
+        });
+
+        function switchTab(tabId) {
+            activeTab = tabId;
+            const sections = ['am-perf', 'supp-input', 'live-bidding', 'prices-ceilings', 'supp-accept'];
+            
+            sections.forEach(sec => {
+                const el = document.getElementById(`sec-${sec}`);
+                const navBtn = document.getElementById(`nav-${sec}`);
+                if (sec === tabId) {
+                    el.classList.remove('hidden');
+                    navBtn.className = "touch-target flex flex-col items-center justify-center py-1 text-licious-emerald font-bold rounded-xl transition";
+                } else {
+                    el.classList.add('hidden');
+                    navBtn.className = "touch-target flex flex-col items-center justify-center py-1 text-slate-400 font-normal rounded-xl transition";
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function setAMTimeframe(tf) {
+            amTimeframe = tf;
+            ['day', 'week', 'month'].forEach(t => {
+                const btn = document.getElementById(`tf-${t}`);
+                if (t === tf) {
+                    btn.className = "flex-1 py-2 rounded-lg text-xs font-semibold text-center transition bg-licious-emerald text-white shadow-sm";
+                } else {
+                    btn.className = "flex-1 py-2 rounded-lg text-xs font-semibold text-center text-slate-600 hover:bg-slate-100 transition";
+                }
+            });
+
+            // Adjust health metrics dynamically based on timeframe
+            if (tf === 'day') {
+                document.getElementById('healthScoreValue').innerText = "94.2";
+                document.getElementById('metricPriceIdx').innerText = "98.4%";
+                document.getElementById('metricFillRate').innerText = "96.8%";
+                document.getElementById('metricQuality').innerText = "98.1%";
+                document.getElementById('metricScale').innerText = "4,850 kg";
+            } else if (tf === 'week') {
+                document.getElementById('healthScoreValue').innerText = "95.8";
+                document.getElementById('metricPriceIdx').innerText = "97.9%";
+                document.getElementById('metricFillRate').innerText = "97.4%";
+                document.getElementById('metricQuality').innerText = "98.5%";
+                document.getElementById('metricScale').innerText = "32,400 kg";
+            } else {
+                document.getElementById('healthScoreValue').innerText = "93.9";
+                document.getElementById('metricPriceIdx').innerText = "99.1%";
+                document.getElementById('metricFillRate').innerText = "95.2%";
+                document.getElementById('metricQuality').innerText = "97.8%";
+                document.getElementById('metricScale').innerText = "142,800 kg";
+            }
+            showToast(`Timeframe updated to ${tf.toUpperCase()}`);
+        }
+
+        function renderAMDashboard() {
+            renderSupplierPerfList();
+        }
+
+        function renderSupplierPerfList() {
+            const container = document.getElementById('supplierPerfList');
+            const search = (document.getElementById('suppSearchPerf')?.value || '').toLowerCase();
+            const filtered = suppliers.filter(s => s.name.toLowerCase().includes(search));
+
+            container.innerHTML = filtered.map(s => `
+                <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="font-bold text-slate-800 block">${s.name}</span>
+                        <div class="flex gap-2 mt-0.5 text-[10px] text-slate-500">
+                            <span>Quality: <b class="text-emerald-700">${s.quality}%</b></span>
+                            <span>•</span>
+                            <span>Lines: <b>${s.lineItems}</b></span>
+                            <span>•</span>
+                            <span>On-Time: <b>${s.onTime}</b></span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-black text-slate-900">${s.fill}%</span>
+                        <span class="text-[10px] text-emerald-600 block font-semibold">Fill Rate</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        /* SECTION 2: SUPPLIER INPUT LOGIC */
+        function handleDirectEntrySubmit(e) {
+            e.preventDefault();
+            const supp = document.getElementById('deSupplier').value;
+            const sku = document.getElementById('deSKU').value;
+            const grade = document.getElementById('deGrade').value;
+            const qty = document.getElementById('deQty').value;
+            const price = document.getElementById('dePrice').value;
+
+            // Check if supplier x SKU is red-flagged
+            const isFlagged = redFlags.some(rf => rf.supplier === supp && rf.sku === sku);
+            if (isFlagged) {
+                showToast(`⚠️ Cannot submit! ${supp} is RED-FLAGGED for ${sku}. Zero allocation enforced.`, 'red');
+                return;
+            }
+
+            showToast(`✅ Submitted ${qty}kg ${sku} (${grade}) @ ₹${price}/kg for ${supp}!`);
+            document.getElementById('directEntryForm').reset();
+        }
+
+        function setSEHTab(tab) {
+            sehTab = tab;
+            const btnSub = document.getElementById('sehTabSubmitted');
+            const btnPen = document.getElementById('sehTabPending');
+            if (tab === 'submitted') {
+                btnSub.className = "flex-1 py-1.5 font-bold rounded-md bg-white text-slate-800 shadow-sm";
+                btnPen.className = "flex-1 py-1.5 font-bold rounded-md text-slate-500 hover:text-slate-800";
+            } else {
+                btnPen.className = "flex-1 py-1.5 font-bold rounded-md bg-white text-slate-800 shadow-sm";
+                btnSub.className = "flex-1 py-1.5 font-bold rounded-md text-slate-500 hover:text-slate-800";
+            }
+            renderSEHList();
+        }
+
+        function renderSEHList() {
+            const container = document.getElementById('sehSupplierList');
+            const filtered = suppliers.filter(s => s.sehStatus === sehTab);
+
+            container.innerHTML = filtered.map(s => `
+                <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="font-bold text-slate-800">${s.name}</span>
+                        <p class="text-[10px] text-slate-400 mt-0.5">${s.sehStatus === 'submitted' ? 'Entry received via Portal' : 'Awaiting availability response'}</p>
+                    </div>
+                    ${s.sehStatus === 'pending' ? `
+                        <button onclick="nudgeSupplier('${s.name}')" class="touch-target px-3 py-1 bg-amber-500 text-white font-bold text-[11px] rounded-lg shadow-sm hover:bg-amber-600 transition flex items-center gap-1">
+                            <i class="fa-solid fa-bell"></i> Nudge
+                        </button>
+                    ` : `
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Active</span>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function nudgeSupplier(name) {
+            const supp = suppliers.find(s => s.name === name);
+            if (supp) supp.nudged = true;
+            showToast(`📲 Nudge sent to ${name} via WhatsApp & SMS!`);
+        }
+
+        function handleAddRedFlag(e) {
+            e.preventDefault();
+            const supp = document.getElementById('rfSupplier').value;
+            const sku = document.getElementById('rfSKU').value;
+            
+            if (!supp || !sku) return;
+
+            redFlags.push({
+                id: Date.now(),
+                supplier: supp,
+                sku: sku,
+                reason: "Manual AM red flag added"
+            });
+
+            renderRedFlags();
+            showToast(`🚫 Red-Flagged ${supp} x ${sku}! 0 orders enforced.`, 'red');
+            document.getElementById('rfSupplier').value = "";
+            document.getElementById('rfSKU').value = "";
+        }
+
+        function removeRedFlag(id) {
+            redFlags = redFlags.filter(rf => rf.id !== id);
+            renderRedFlags();
+            showToast(`Cleared Red Flag rule.`);
+        }
+
+        function renderRedFlags() {
+            const container = document.getElementById('redFlagList');
+            if (redFlags.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-slate-400 italic">No red flags active.</p>`;
+                return;
+            }
+
+            container.innerHTML = redFlags.map(rf => `
+                <div class="p-2 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="font-bold text-rose-900">${rf.supplier}</span>
+                        <span class="text-rose-700 block text-[10px] font-semibold">${rf.sku}</span>
+                    </div>
+                    <button onclick="removeRedFlag(${rf.id})" class="touch-target px-2 py-1 bg-white text-rose-700 hover:bg-rose-100 text-[10px] font-bold rounded border border-rose-300">
+                        Clear
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderLiveBiddingStream() {
+            const container = document.getElementById('biddingCardsStream');
+            const navBadge = document.getElementById('navBidBadge');
+            const queueBadge = document.getElementById('biddingQueueBadge');
+
+            if (navBadge) navBadge.innerText = biddingItems.length;
+            if (queueBadge) queueBadge.innerText = `${biddingItems.length} Active Bids`;
+
+            if (biddingItems.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center space-y-2">
+                        <i class="fa-solid fa-circle-check text-4xl text-emerald-500"></i>
+                        <h3 class="font-bold text-sm text-slate-800">All Bids Cleared!</h3>
+                        <p class="text-xs text-slate-500">No pending bids requiring manual intervention right now.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // AUTO-SORT: Manual approvals required (isBreach / noCeiling) FLOAT TO TOP sorted by highest elapsed time
+            const sortedItems = [...biddingItems].sort((a, b) => {
+                const aNeedsManual = a.isBreach || a.noCeiling;
+                const bNeedsManual = b.isBreach || b.noCeiling;
+
+                if (aNeedsManual && !bNeedsManual) return -1;
+                if (!aNeedsManual && bNeedsManual) return 1;
+                return b.elapsedSec - a.elapsedSec;
+            });
+
+            container.innerHTML = sortedItems.map(item => {
+                if (item.isBreach) {
+                    // PRICE LIMIT BREACH CARD
+                    return `
+                        <div class="bg-white p-3.5 rounded-2xl border-2 border-rose-300 shadow-md space-y-2.5 relative overflow-hidden">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-rose-100 text-rose-800 text-[10px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> Ceiling Breach (${item.breachPct})
+                                    </span>
+                                    <span class="text-[10px] font-semibold text-slate-400">Timer: ${item.elapsedSec}s</span>
+                                </div>
+                                <span class="text-xs font-bold text-slate-800">${item.supplier}</span>
+                            </div>
+
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <h3 class="font-extrabold text-sm text-slate-900">${item.sku}</h3>
+                                    <p class="text-xs font-medium text-slate-500">${item.grade} • Qty: <b class="text-slate-800">${item.qty} kg</b></p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-slate-400 line-through">Ceiling: ₹${item.ceilingPrice}</span>
+                                    <div class="text-lg font-black text-rose-600">₹${item.bidPrice}<span class="text-xs font-normal text-slate-500">/kg</span></div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <a href="tel:${item.phone}" class="touch-target py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                                    <i class="fa-solid fa-phone text-emerald-700"></i> Call Supplier
+                                </a>
+                                <button onclick="approveBiddingItem(${item.id})" class="touch-target py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-check"></i> Approve Breach
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (item.noCeiling) {
+                    // NO CEILING DEFINED CARD
+                    return `
+                        <div class="bg-white p-3.5 rounded-2xl border-2 border-amber-300 shadow-md space-y-2.5">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-amber-100 text-amber-900 text-[10px] font-extrabold px-2 py-0.5 rounded-md">
+                                        ⚠️ No Ceiling Defined
+                                    </span>
+                                    <span class="text-[10px] font-semibold text-slate-400">Timer: ${item.elapsedSec}s</span>
+                                </div>
+                                <span class="text-xs font-bold text-slate-800">${item.supplier}</span>
+                            </div>
+
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <h3 class="font-extrabold text-sm text-slate-900">${item.sku}</h3>
+                                    <p class="text-xs font-medium text-slate-500">${item.grade} • Qty: <b class="text-slate-800">${item.qty} kg</b></p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-black text-amber-700">₹${item.bidPrice}<span class="text-xs font-normal text-slate-500">/kg</span></div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <a href="tel:${item.phone}" class="touch-target py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition">
+                                    <i class="fa-solid fa-phone text-emerald-700"></i> Call Supplier
+                                </a>
+                                <button onclick="approveBiddingItem(${item.id})" class="touch-target py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-check"></i> Approve Bid
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // AUTO-APPROVED CARD
+                    return `
+                        <div class="bg-white p-3.5 rounded-2xl border border-emerald-200 shadow-sm space-y-2">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-md flex items-center gap-1">
+                                    <i class="fa-solid fa-circle-check"></i> Auto-Approved (Within Ceiling)
+                                </span>
+                                <span class="text-[10px] font-semibold text-slate-400">Timer: ${item.elapsedSec}s</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-bold text-xs text-slate-900">${item.sku} (${item.grade})</h3>
+                                    <p class="text-[11px] text-slate-500">${item.supplier} • ${item.qty} kg</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-black text-licious-emerald">₹${item.bidPrice}/kg</span>
+                                    <span class="text-[10px] text-slate-400 block">Cap: ₹${item.ceilingPrice}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function approveBiddingItem(id) {
+            const item = biddingItems.find(i => i.id === id);
+            if (!item) return;
+
+            // Move to Allocation dataset
+            allocations.push({
+                id: Date.now(),
+                supplier: item.supplier,
+                sku: item.sku,
+                grade: item.grade,
+                qty: item.qty,
+                price: item.bidPrice,
+                status: "locked",
+                tag: "Accepted via Live Bidding Stream"
+            });
+
+            // Remove from bidding queue
+            biddingItems = biddingItems.filter(i => i.id !== id);
+
+            renderLiveBiddingStream();
+            renderSupplierAcceptList();
+            showToast(`Approved ${item.sku} (${item.qty}kg) for ${item.supplier}! Moved to Lock-In queue.`);
+        }
+
+        function renderMarketPriceCards() {
+            const container = document.getElementById('marketPriceCardsGrid');
+
+            // Sample prices for each Seawater Fish SKU across Grade A, B, C
+            const priceData = [
+                { sku: "King Fish / Surmai", change: "+1.8%", grades: [{ name: "Grade A", min: 640, avg: 680, max: 710 }, { name: "Grade B", min: 580, avg: 610, max: 640 }, { name: "Grade C", min: 490, avg: 520, max: 550 }] },
+                { sku: "Black Pomfret", change: "-0.5%", grades: [{ name: "Grade A", min: 520, avg: 550, max: 580 }, { name: "Grade B", min: 460, avg: 490, max: 510 }, { name: "Grade C", min: 380, avg: 410, max: 440 }] },
+                { sku: "White Pomfret", change: "+3.2%", grades: [{ name: "Grade A", min: 810, avg: 850, max: 890 }, { name: "Grade B", min: 720, avg: 760, max: 790 }, { name: "Grade C", min: 610, avg: 640, max: 680 }] },
+                { sku: "Indian Salmon / Rawas", change: "0.0%", grades: [{ name: "Grade A", min: 690, avg: 730, max: 760 }, { name: "Grade B", min: 610, avg: 640, max: 680 }, { name: "Grade C", min: 520, avg: 550, max: 580 }] },
+                { sku: "Red Snapper", change: "-1.2%", grades: [{ name: "Grade A", min: 440, avg: 470, max: 500 }, { name: "Grade B", min: 380, avg: 410, max: 430 }, { name: "Grade C", min: 310, avg: 340, max: 370 }] },
+                { sku: "Yellowfin Tuna", change: "+2.1%", grades: [{ name: "Grade A", min: 360, avg: 390, max: 420 }, { name: "Grade B", min: 310, avg: 340, max: 360 }, { name: "Grade C", min: 250, avg: 280, max: 300 }] },
+                { sku: "Seer Fish", change: "+0.8%", grades: [{ name: "Grade A", min: 620, avg: 660, max: 700 }, { name: "Grade B", min: 550, avg: 580, max: 610 }, { name: "Grade C", min: 470, avg: 500, max: 530 }] },
+                { sku: "Mackerel / Bangda", change: "-2.4%", grades: [{ name: "Grade A", min: 170, avg: 190, max: 210 }, { name: "Grade B", min: 140, avg: 160, max: 180 }, { name: "Grade C", min: 110, avg: 130, max: 140 }] }
+            ];
+
+            container.innerHTML = priceData.map(item => `
+                <div onclick="openPriceBreakdownModal('${item.sku}')" class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-sm cursor-pointer hover:border-emerald-300 transition active:scale-[0.99] space-y-2">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-fish-fins text-licious-emerald"></i>
+                            <h3 class="font-extrabold text-xs text-slate-900">${item.sku}</h3>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] font-bold ${item.change.startsWith('+') ? 'text-rose-600 bg-rose-50' : 'text-emerald-700 bg-emerald-50'} px-1.5 py-0.5 rounded">
+                                ${item.change} vs Yesterday
+                            </span>
+                            <i class="fa-solid fa-chevron-right text-slate-300 text-[10px]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Non-editable summary table for 3 grades -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-[11px]">
+                            <thead>
+                                <tr class="text-slate-400 uppercase text-[9px] border-b border-slate-100">
+                                    <th class="py-1">Grade</th>
+                                    <th class="py-1 text-center">Min (₹)</th>
+                                    <th class="py-1 text-center">Avg (₹)</th>
+                                    <th class="py-1 text-right">Max (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 font-medium text-slate-700">
+                                ${item.grades.map(g => `
+                                    <tr>
+                                        <td class="py-1 font-bold text-slate-900">${g.name}</td>
+                                        <td class="py-1 text-center text-slate-500">₹${g.min}</td>
+                                        <td class="py-1 text-center font-bold text-licious-emerald">₹${g.avg}</td>
+                                        <td class="py-1 text-right text-slate-500">₹${g.max}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleCreateCeilingRule(e) {
+            e.preventDefault();
+            const supp = document.getElementById('crSupplier').value;
+            const sku = document.getElementById('crSKU').value;
+            const grade = document.getElementById('crGrade').value;
+            const tol = parseFloat(document.getElementById('crTolerance').value);
+
+            ceilingRules.push({
+                id: Date.now(),
+                supplier: supp,
+                sku: sku,
+                grade: grade,
+                tolerancePct: tol
+            });
+
+            renderCeilingRules();
+            showToast(`Saved ceiling tolerance rule (+${tol}% max)`);
+        }
+
+        function deleteCeilingRule(id) {
+            ceilingRules = ceilingRules.filter(r => r.id !== id);
+            renderCeilingRules();
+            showToast(`Ceiling rule deleted.`);
+        }
+
+        function renderCeilingRules() {
+            const container = document.getElementById('activeCeilingRulesList');
+            if (ceilingRules.length === 0) {
+                container.innerHTML = `<p class="text-[11px] text-slate-400 italic">No custom ceiling rules configured.</p>`;
+                return;
+            }
+
+            container.innerHTML = ceilingRules.map(r => `
+                <div class="p-2.5 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-slate-800 block">${r.sku} (${r.grade})</span>
+                        <span class="text-[10px] text-slate-500">${r.supplier} • Max Tol: <b class="text-emerald-700">+${r.tolerancePct}%</b></span>
+                    </div>
+                    <button onclick="deleteCeilingRule(${r.id})" class="touch-target px-2 py-1 text-slate-400 hover:text-rose-600 transition">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function setAcceptFilter(filter) {
+            acceptFilter = filter;
+            const tabs = ['locked', 'pending', 'no_avail'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`acceptTab${t === 'locked' ? 'Locked' : t === 'pending' ? 'Pending' : 'NoAvail'}`);
+                if (t === filter) {
+                    btn.className = "flex-1 py-1.5 rounded-md font-bold bg-white text-slate-800 shadow-sm";
+                } else {
+                    btn.className = "flex-1 py-1.5 rounded-md font-bold text-slate-500";
+                }
+            });
+            renderSupplierAcceptList();
+        }
+
+        function renderSupplierAcceptList() {
+            const container = document.getElementById('supplierAcceptList');
+            const filtered = allocations.filter(a => a.status === acceptFilter);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-400 text-xs">
+                        No orders in this status tab.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(a => {
+                const totalValue = (a.qty * a.price).toLocaleString('en-IN');
+                return `
+                    <div class="bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm space-y-2.5">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <span class="text-xs font-bold text-slate-900">${a.supplier}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${
+                                a.status === 'locked' ? 'bg-emerald-100 text-emerald-800' :
+                                a.status === 'pending' ? 'bg-amber-100 text-amber-900' : 'bg-rose-100 text-rose-800'
+                            }">
+                                ${a.tag}
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between items-end text-xs">
+                            <div>
+                                <h3 class="font-extrabold text-slate-800 text-xs">${a.sku}</h3>
+                                <p class="text-[11px] text-slate-500 mt-0.5">${a.grade} • Qty: <b class="text-slate-800">${a.qty} kg</b></p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] text-slate-400 block">Total Order Value</span>
+                                <span class="font-extrabold text-sm text-licious-emerald">₹${totalValue}</span>
+                            </div>
+                        </div>
+
+                        ${a.status === 'pending' ? `
+                            <button onclick="openOverrideModal(${a.id})" class="touch-target w-full py-2 bg-licious-emerald hover:bg-licious-dark text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-user-gear"></i> Override & Accept on Behalf
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openOverrideModal(id) {
+            const alloc = allocations.find(a => a.id === id);
+            if (!alloc) return;
+
+            currentOverrideId = id;
+            document.getElementById('ovSuppName').innerText = alloc.supplier;
+            document.getElementById('ovSKUGrade').innerText = `${alloc.sku} - ${alloc.grade}`;
+            document.getElementById('ovQtyInput').value = alloc.qty;
+            document.getElementById('overrideModal').classList.remove('hidden');
+        }
+
+        function closeOverrideModal() {
+            document.getElementById('overrideModal').classList.add('hidden');
+        }
+
+        function confirmAMOverride() {
+            if (!currentOverrideId) return;
+
+            const alloc = allocations.find(a => a.id === currentOverrideId);
+            if (alloc) {
+                const newQty = parseInt(document.getElementById('ovQtyInput').value) || alloc.qty;
+                alloc.qty = newQty;
+                alloc.status = "locked";
+                alloc.tag = "AM Manual Override";
+            }
+
+            closeOverrideModal();
+            renderSupplierAcceptList();
+            showToast(`✅ AM Override successful! Accepted ${alloc.qty}kg on behalf of ${alloc.supplier}.`);
+        }
+
+        function openBulkCSVModal() {
+            document.getElementById('bulkCSVModal').classList.remove('hidden');
+        }
+
+        function closeBulkCSVModal() {
+            document.getElementById('bulkCSVModal').classList.add('hidden');
+        }
+
+        function downloadSampleCSV() {
+            const csvContent = "Supplier,SKU,Grade,QtyKg,BasePriceINR\nCoastline Catch Ltd,King Fish / Surmai,Grade A,400,680\nOcean Fresh Co,White Pomfret,Grade B,300,750";
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "Licious_Seawater_Procurement_Template.csv";
+            a.click();
+            showToast("Downloaded sample CSV template.");
+        }
+
+        function processBulkCSV() {
+            closeBulkCSVModal();
+            showToast("Bulk CSV parsed successfully! 12 SKU items updated.");
+        }
+
+        function handleCSVFileSelect(e) {
+            if (e.target.files.length > 0) {
+                showToast(`File selected: ${e.target.files[0].name}`);
+            }
+        }
+
+        function openPriceBreakdownModal(sku) {
+            activeModalSKU = sku;
+            document.getElementById('modalSKUTitle').innerText = sku;
+            
+            const list = document.getElementById('modalSupplierBreakdownList');
+            // Mock line items for this SKU
+            list.innerHTML = `
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-800">Coastline Catch Ltd</span>
+                        <p class="text-[10px] text-slate-500">Grade A • 400 kg available</p>
+                    </div>
+                    <span class="font-black text-licious-emerald">₹680/kg</span>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-800">Ocean Fresh Co</span>
+                        <p class="text-[10px] text-slate-500">Grade A • 250 kg available</p>
+                    </div>
+                    <span class="font-black text-licious-emerald">₹705/kg</span>
+                </div>
+                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-800">Malpe Marine Traders</span>
+                        <p class="text-[10px] text-slate-500">Grade B • 500 kg available</p>
+                    </div>
+                    <span class="font-black text-licious-emerald">₹610/kg</span>
+                </div>
+            `;
+
+            document.getElementById('priceBreakdownModal').classList.remove('hidden');
+        }
+
+        function closePriceBreakdownModal() {
+            document.getElementById('priceBreakdownModal').classList.add('hidden');
+        }
+
+        function exportModalSKUCSV() {
+            const csvContent = `SKU,Supplier,Grade,AvailableQtyKg,PriceINR\n${activeModalSKU},Coastline Catch Ltd,Grade A,400,680\n${activeModalSKU},Ocean Fresh Co,Grade A,250,705\n${activeModalSKU},Malpe Marine Traders,Grade B,500,610`;
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${activeModalSKU.replace(/[^a-zA-Z0-9]/g, '_')}_Breakdown.csv`;
+            a.click();
+            showToast(`Downloaded breakdown for ${activeModalSKU}`);
+        }
+
+        function toggleDatePickerModal() {
+            showToast("Date set to Today (24 Sep 2026)");
+        }
+
+        function showToast(message, color = 'emerald') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgClass = color === 'red' ? 'bg-rose-900 border-rose-500 text-rose-100' : 'bg-slate-900 border-emerald-500 text-emerald-300';
+            toast.className = `toast-slide p-3 rounded-xl border shadow-xl text-xs font-semibold flex items-center justify-between mb-2 ${bgClass} pointer-events-auto`;
+            toast.innerHTML = `
+                <span>${message}</span>
+                <i class="fa-solid fa-xmark text-slate-400 hover:text-white cursor-pointer ml-2" onclick="this.parentElement.remove()"></i>
+            `;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentElement) toast.remove();
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
