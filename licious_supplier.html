@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licious Supplier Hub - Seawater Fish Sourcing</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        licious: {
+                            red: '#E52331',
+                            darkRed: '#C41824',
+                            lightRed: '#FDF2F3',
+                            slate: '#1E293B',
+                            gold: '#D97706',
+                            goldLight: '#FEF3C7',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for inner mobile view */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Mobile phone glass effect */
+        .phone-notch {
+            width: 120px;
+            height: 24px;
+            background-color: #0f172a;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        
+        /* Pulse animations for status indicators */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.08); opacity: 0.4; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+        .pulse-live {
+            animation: pulse-ring 2s infinite ease-in-out;
+        }
+
+        /* Glassmorphic bid bar */
+        .bid-bar-shadow {
+            box-shadow: 0 -8px 25px -5px rgba(0, 0, 0, 0.15), 0 -4px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form Highlight Pulse Animation for Re-bid */
+        @keyframes form-highlight {
+            0% { box-shadow: 0 0 0 0 rgba(229, 35, 49, 0.6); }
+            50% { box-shadow: 0 0 0 10px rgba(229, 35, 49, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(229, 35, 49, 0); }
+        }
+        .rebid-active-form {
+            animation: form-highlight 1.5s ease-in-out 2;
+            border-color: #E52331 !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-800 font-sans min-h-screen flex items-center justify-center p-0 md:p-6 select-none">
+
+    <!-- Smartphone Shell Wrapper -->
+    <div class="w-full max-w-md h-screen md:h-[910px] bg-slate-950 md:rounded-[48px] shadow-2xl overflow-hidden border-0 md:border-[10px] border-slate-800 relative flex flex-col">
+        
+        <!-- Mobile Top Status Bar & Notch -->
+        <div class="bg-licious-slate text-white px-6 pt-3 pb-2 flex justify-between items-center text-xs z-40 relative">
+            <span id="live-clock-time" class="font-bold tracking-tight">09:41 AM</span>
+            <div class="phone-notch absolute top-0 left-1/2 -translate-x-1/2 flex items-center justify-center space-x-2">
+                <div class="w-3 h-3 bg-slate-800 rounded-full border border-slate-700"></div>
+                <div class="w-10 h-1.5 bg-slate-800 rounded-full"></div>
+            </div>
+            <div class="flex items-center space-x-2 text-slate-300">
+                <i class="fa-solid fa-signal text-[10px]"></i>
+                <i class="fa-solid fa-wifi text-[10px]"></i>
+                <i class="fa-solid fa-battery-three-quarters text-xs"></i>
+            </div>
+        </div>
+
+        <!-- Licious Mobile Header Bar with Gmail-style Account Icon -->
+        <header class="bg-licious-red text-white px-4 py-3 shadow-md flex items-center justify-between z-30 shrink-0">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white p-1.5 rounded-lg shadow-inner flex items-center justify-center">
+                    <span class="font-black text-licious-red tracking-tighter text-sm italic">Licious</span>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm leading-tight flex items-center gap-1.5">
+                        Supplier Hub
+                        <span class="bg-white/20 text-[10px] font-medium px-1.5 py-0.2 rounded text-white">Mangalore Dock</span>
+                    </h1>
+                    <p class="text-[11px] text-red-100 flex items-center gap-1">
+                        <i class="fa-solid fa-anchor text-[9px]"></i>
+                        Seawater Sourcing • AM: Rajesh K.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Gmail-like Account Profile Avatar & Notification Button -->
+            <div class="flex items-center space-x-1.5">
+                <button onclick="toggleNotificationModal(true)" class="relative p-2 text-white hover:bg-white/10 rounded-full transition">
+                    <i class="fa-regular fa-bell text-base"></i>
+                    <span class="absolute top-1 right-1 w-2.5 h-2.5 bg-amber-400 rounded-full border-2 border-licious-red"></span>
+                </button>
+                <button onclick="toggleProfileModal(true)" class="w-8 h-8 rounded-full bg-slate-900 border-2 border-white/80 text-white font-extrabold text-xs flex items-center justify-center shadow hover:scale-105 transition">
+                    MS
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Scrollable App Screen Content -->
+        <main id="app-main-container" class="flex-1 overflow-y-auto no-scrollbar bg-slate-50 relative pb-36">
+            
+            <!-- TAB 1: TIERING & SCORE -->
+            <section id="tab-1" class="tab-content p-4 space-y-4">
+                <!-- Tier Header Card -->
+                <div class="bg-gradient-to-br from-amber-500 via-amber-600 to-amber-700 rounded-2xl p-4 text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-4 -bottom-4 text-amber-400/20 text-9xl font-black">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <div class="inline-flex items-center gap-1.5 bg-amber-900/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-amber-300/30 text-xs font-semibold text-amber-100">
+                                <i class="fa-solid fa-crown text-amber-300"></i>
+                                Gold Tier Supplier
+                            </div>
+                            <h2 class="text-2xl font-extrabold mt-2">Score: 88<span class="text-xs font-normal text-amber-200">/100</span></h2>
+                            <p class="text-xs text-amber-100 mt-0.5">Top 12% in Mangalore Coastal Zone</p>
+                        </div>
+                        <button onclick="toggleTierMatrixModal(true)" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition border border-white/30" title="Score to Tier Matrix">
+                            <i class="fa-solid fa-info text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="mt-4 relative z-10">
+                        <div class="flex justify-between text-[11px] font-medium text-amber-100 mb-1">
+                            <span>Iron & Silver</span>
+                            <span class="font-bold text-white">Gold (71-90)</span>
+                            <span>Platinum (91-100)</span>
+                        </div>
+                        <div class="w-full bg-amber-900/50 rounded-full h-2.5 overflow-hidden p-0.5 border border-amber-300/30">
+                            <div class="bg-gradient-to-r from-amber-300 to-amber-100 h-1.5 rounded-full" style="width: 88%;"></div>
+                        </div>
+                        <p class="text-[10px] text-amber-200 text-right mt-1">3 pts to reach Platinum Tier 🔥</p>
+                    </div>
+                </div>
+
+                <!-- Section Score Breakdown list -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-licious-red"></i>
+                            Performance Breakdown
+                        </h3>
+                        <span class="text-[11px] text-slate-500">Tap metric for details</span>
+                    </div>
+
+                    <div class="space-y-2.5" id="tier-score-rows">
+                        <!-- Score rows injected dynamically -->
+                    </div>
+                </div>
+
+                <!-- Incentive Quick Banner -->
+                <div class="bg-slate-900 text-white rounded-2xl p-4 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">Weekly Tier Bonus</p>
+                            <p class="text-sm font-bold text-white">+₹2,450 Earned</p>
+                        </div>
+                    </div>
+                    <button onclick="switchTab('tab-2')" class="text-xs text-emerald-400 font-semibold hover:underline flex items-center gap-1">
+                        View <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- TAB 2: WEEKLY INCENTIVE -->
+            <section id="tab-2" class="tab-content hidden p-4 space-y-4">
+                <!-- Incentive Hero Card -->
+                <div class="bg-gradient-to-br from-emerald-600 to-teal-800 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs text-emerald-200 font-medium tracking-wide uppercase">This Week's Sourcing Incentive</span>
+                            <h2 class="text-3xl font-extrabold mt-1 tracking-tight">₹2,450</h2>
+                            <p class="text-xs text-emerald-100 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-circle-check text-emerald-300"></i>
+                                Auto-payout scheduled for Monday
+                            </p>
+                        </div>
+                        <button onclick="toggleIncentiveMatrixModal(true)" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center border border-white/30 transition">
+                            <i class="fa-solid fa-info text-xs"></i>
+                        </button>
+                    </div>
+
+                    <!-- Incentive Milestones -->
+                    <div class="mt-5 pt-4 border-t border-emerald-500/40">
+                        <div class="flex justify-between text-xs font-medium mb-1.5">
+                            <span>Current Earned: ₹2,450</span>
+                            <span class="text-emerald-200">Next Milestone: ₹3,500</span>
+                        </div>
+                        <div class="w-full bg-emerald-950/40 rounded-full h-2">
+                            <div class="bg-emerald-300 h-2 rounded-full" style="width: 70%;"></div>
+                        </div>
+                        <p class="text-[11px] text-emerald-200 mt-2">
+                            💡 Deliver 120 kg of Grade A+ Kingfish before Friday to unlock +₹1,050 bonus!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Incentive Breakdown Cards -->
+                <div class="space-y-3">
+                    <h3 class="font-bold text-slate-800 text-sm flex items-center justify-between">
+                        <span>Bonus Components</span>
+                        <span class="text-xs font-normal text-slate-500">Weekly Cycle</span>
+                    </h3>
+
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">On-Time Dock Landing</h4>
+                                <p class="text-[11px] text-slate-500">100% on-time vessel unloading</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-emerald-600">+₹1,000</span>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                                <i class="fa-solid fa-gem"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">Grade Accuracy Bonus</h4>
+                                <p class="text-[11px] text-slate-500">96.8% grade match vs QC check</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-emerald-600">+₹950</span>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 flex items-center justify-between shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                                <i class="fa-solid fa-truck-ramp-box"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-800">High Fill-Rate Bonus</h4>
+                                <p class="text-[11px] text-slate-500">&gt;95% promised catch delivered</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-emerald-600">+₹500</span>
+                    </div>
+                </div>
+
+                <div class="bg-slate-100 p-3.5 rounded-xl text-center border border-slate-200">
+                    <p class="text-xs text-slate-600 mb-2">Want to know how bonuses work for each fish tier?</p>
+                    <button onclick="toggleIncentiveMatrixModal(true)" class="w-full bg-slate-800 text-white py-2 rounded-lg text-xs font-semibold hover:bg-slate-700 transition">
+                        View Incentive Rule Matrix
+                    </button>
+                </div>
+            </section>
+
+            <!-- TAB 3: DAILY CATCH LOGGER -->
+            <section id="tab-3" class="tab-content hidden p-4 space-y-4">
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h2 class="font-extrabold text-slate-900 text-base">Daily Seawater Catch Logger</h2>
+                            <p class="text-xs text-slate-500">Log seawater fish landed today at jetty</p>
+                        </div>
+                        <span class="bg-slate-100 text-slate-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-slate-200">
+                            Today
+                        </span>
+                    </div>
+
+                    <!-- AI Dictation & Scanner Demo tools -->
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <button onclick="simulateVoiceDictation()" id="mic-btn" class="flex flex-col items-center justify-center p-2.5 bg-red-50 text-licious-red border border-red-200 rounded-xl hover:bg-red-100 transition">
+                            <i class="fa-solid fa-microphone text-base mb-1"></i>
+                            <span class="text-[10px] font-bold">Voice Entry</span>
+                        </button>
+                        <button onclick="simulateImageScan()" id="camera-btn" class="flex flex-col items-center justify-center p-2.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-xl hover:bg-blue-100 transition">
+                            <i class="fa-solid fa-camera text-base mb-1"></i>
+                            <span class="text-[10px] font-bold">AI Photo Scan</span>
+                        </button>
+                        <button onclick="parseDemoCSV()" class="flex flex-col items-center justify-center p-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl hover:bg-emerald-100 transition">
+                            <i class="fa-solid fa-file-csv text-base mb-1"></i>
+                            <span class="text-[10px] font-bold">Import CSV</span>
+                        </button>
+                    </div>
+
+                    <!-- Catch Input Form -->
+                    <form id="catch-entry-form" onsubmit="handleCatchSubmit(event)" class="space-y-3 pt-2 border-t border-slate-100">
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Fish SKU / Variety</label>
+                                <select id="catch-sku" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-licious-red">
+                                    <option value="Kingfish / Surmai">Kingfish / Surmai</option>
+                                    <option value="White Pomfret">White Pomfret</option>
+                                    <option value="Black Pomfret">Black Pomfret</option>
+                                    <option value="Red Snapper">Red Snapper</option>
+                                    <option value="Seer Fish">Seer Fish</option>
+                                    <option value="Barramundi / Asian Sea Bass">Barramundi / Asian Sea Bass</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Grade</label>
+                                <select id="catch-grade" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-licious-red">
+                                    <option value="Grade A+">Grade A+ (Premium Export)</option>
+                                    <option value="Grade A">Grade A (Fresh Local Standard)</option>
+                                    <option value="Grade B">Grade B (Processing Quality)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2.5">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-1">Catch Qty (kg)</label>
+                                <input type="number" id="catch-qty" min="1" max="5000" placeholder="e.g. 150" required class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium text-slate-800 focus:outline-none focus:border-licious-red">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-licious-red mb-1">Base Price (₹/kg) *</label>
+                                <input type="number" id="catch-base-price" min="50" max="5000" placeholder="e.g. 620" required class="w-full bg-red-50 border border-red-300 rounded-lg p-2 text-xs font-bold text-slate-900 focus:outline-none focus:border-licious-red">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-licious-red text-white font-bold py-2.5 rounded-xl text-xs hover:bg-licious-darkRed transition shadow-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i>
+                            Log Catch Entry
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Logged Catch Table / List -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+                            <i class="fa-solid fa-list-check text-licious-red"></i>
+                            Logged Catch Entries
+                        </h3>
+                        <span id="catch-count-badge" class="bg-slate-100 text-slate-700 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            3 Items
+                        </span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-[10px] uppercase text-slate-400 border-b border-slate-100 font-bold">
+                                    <th class="py-2">SKU & Grade</th>
+                                    <th class="py-2 text-right">Qty</th>
+                                    <th class="py-2 text-right">Base Price</th>
+                                    <th class="py-2 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="catch-log-tbody" class="divide-y divide-slate-100 text-xs">
+                                <!-- Dynamic catch items injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: FISH GRADING TOOL -->
+            <section id="tab-4" class="tab-content hidden p-4 space-y-4">
+                <!-- Single Mismatch Alert Banner -->
+                <div onclick="openMismatchModal()" class="bg-amber-50 border-l-4 border-amber-500 p-3.5 rounded-r-xl shadow-sm cursor-pointer hover:bg-amber-100/70 transition">
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-start gap-2.5">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base mt-0.5"></i>
+                            <div>
+                                <h4 class="text-xs font-bold text-amber-900">1 Grading Mismatch Found Last Week</h4>
+                                <p class="text-[11px] text-amber-700 mt-0.5">Kingfish #K-409 (Logged A+ vs Audited A)</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] bg-amber-200 text-amber-800 font-bold px-2 py-0.5 rounded-full">Tap Details</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Grading Assessment Wizard -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h3 class="font-extrabold text-slate-900 text-sm">Interactive Fish Quality Evaluator</h3>
+                            <p class="text-[11px] text-slate-500">Dynamic 6-Question Quality Diagnostic</p>
+                        </div>
+                        <span class="bg-red-50 text-licious-red text-[10px] font-bold px-2 py-0.5 rounded">QC Assistant</span>
+                    </div>
+
+                    <!-- SKU Selection for Grading -->
+                    <div class="mb-4">
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Select SKU to Evaluate Quality</label>
+                        <select id="grading-sku-select" onchange="resetGradingWizard()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-licious-red">
+                            <option value="Kingfish / Surmai">Kingfish / Surmai</option>
+                            <option value="White Pomfret">White Pomfret</option>
+                            <option value="Red Snapper">Red Snapper</option>
+                            <option value="Barramundi / Asian Sea Bass">Barramundi / Asian Sea Bass</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Questionnaire -->
+                    <div id="grading-wizard-container" class="space-y-4 pt-2 border-t border-slate-100">
+                        <!-- Questions injected via JS -->
+                    </div>
+
+                    <div id="grading-result-box" class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 hidden">
+                        <!-- Grading Output result -->
+                    </div>
+                </div>
+
+                <!-- Grade Guide Matrix -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80">
+                    <h3 class="font-bold text-slate-800 text-xs uppercase tracking-wider text-slate-400 mb-2">Licious Standard Grade Guide</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-emerald-800">Grade A+ (Premium Export)</span>
+                                <p class="text-[10px] text-emerald-600">Convex clear eyes, bright red gills, temp &le;2°C, rigid flesh.</p>
+                            </div>
+                            <span class="font-bold text-emerald-700 text-xs">100% Payout</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-blue-50 border border-blue-200 flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-blue-800">Grade A (Standard Fresh)</span>
+                                <p class="text-[10px] text-blue-600">Slightly flat eyes, pinkish gills, firm flesh, temp &le;4°C.</p>
+                            </div>
+                            <span class="font-bold text-blue-700 text-xs">95% Payout</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-amber-50 border border-amber-200 flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-amber-800">Grade B (Processing)</span>
+                                <p class="text-[10px] text-amber-600">Dull skin, faint odor, slightly soft, temp &gt;4°C.</p>
+                            </div>
+                            <span class="font-bold text-amber-700 text-xs">80% Payout</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: SUPPLIER FEEDBACK & NPS -->
+            <section id="tab-5" class="tab-content hidden p-4 space-y-4">
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80" id="feedback-form-card">
+                    <h2 class="font-extrabold text-slate-900 text-base mb-1">Supplier Daily Feedback & NPS</h2>
+                    <p class="text-xs text-slate-500 mb-4">Rate today's landing & offloading experience (1 submission / day)</p>
+
+                    <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-2 text-center">How likely are you to recommend Licious Dock Sourcing?</label>
+                            <div class="flex justify-center items-center gap-2" id="star-rating-container">
+                                <button type="button" onclick="setStarRating(1)" class="star-btn text-2xl text-slate-300 hover:text-amber-400 transition"><i class="fa-solid fa-star"></i></button>
+                                <button type="button" onclick="setStarRating(2)" class="star-btn text-2xl text-slate-300 hover:text-amber-400 transition"><i class="fa-solid fa-star"></i></button>
+                                <button type="button" onclick="setStarRating(3)" class="star-btn text-2xl text-slate-300 hover:text-amber-400 transition"><i class="fa-solid fa-star"></i></button>
+                                <button type="button" onclick="setStarRating(4)" class="star-btn text-2xl text-slate-300 hover:text-amber-400 transition"><i class="fa-solid fa-star"></i></button>
+                                <button type="button" onclick="setStarRating(5)" class="star-btn text-2xl text-slate-300 hover:text-amber-400 transition"><i class="fa-solid fa-star"></i></button>
+                            </div>
+                            <p id="star-label" class="text-center text-[11px] text-slate-400 font-semibold mt-1">Tap a star to rate</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Feedback Category</label>
+                            <select id="feedback-category" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-medium">
+                                <option value="Dock Logistics & Offloading">Dock Logistics & Offloading</option>
+                                <option value="Payment Speed & Clarity">Payment Speed & Clarity</option>
+                                <option value="Area Manager (AM) Support">Area Manager Support</option>
+                                <option value="Grade Transparency">Grade Transparency</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-bold text-slate-700">Comments or Suggestions</label>
+                                <button type="button" onclick="simulateVoiceFeedback()" id="voice-fb-btn" class="text-[11px] text-licious-red font-bold flex items-center gap-1 hover:underline">
+                                    <i class="fa-solid fa-microphone"></i> Dictate
+                                </button>
+                            </div>
+                            <textarea id="feedback-comments" rows="3" placeholder="Tell us about offloading delays, ice availability, or payout clarity..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:outline-none focus:border-licious-red"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-licious-red text-white font-bold py-2.5 rounded-xl text-xs hover:bg-licious-darkRed transition shadow-sm">
+                            Submit Daily Feedback
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Feedback Submitted Locked Card (Initially Hidden) -->
+                <div id="feedback-locked-card" class="bg-white rounded-2xl p-5 shadow-sm border border-emerald-200 text-center hidden space-y-3">
+                    <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <h3 class="text-base font-extrabold text-slate-900">Feedback Submitted for Today</h3>
+                    <p class="text-xs text-slate-600">Thank you! Your feedback helps us improve dock turn-around time and payment transparency.</p>
+                    
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-left text-xs space-y-1">
+                        <div class="flex justify-between font-bold text-slate-700">
+                            <span>Rating: <span class="text-amber-500">5 ★★★★★</span></span>
+                            <span class="text-slate-400">09:12 AM</span>
+                        </div>
+                        <p class="text-slate-600 italic">"Ice slurry at Mangalore Jetty was ready on time. Offloading completed in 20 mins."</p>
+                    </div>
+
+                    <button onclick="resetFeedbackDemo()" class="text-xs text-slate-500 underline font-medium hover:text-slate-800">
+                        Reset Feedback State (Demo Mode)
+                    </button>
+                </div>
+            </section>
+
+            <!-- TAB 6: LIVE BID PORTAL -->
+            <section id="tab-6" class="tab-content hidden p-4 space-y-4">
+                <!-- Portal Header -->
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="font-extrabold text-slate-900 text-base">Live Bid Portal</h2>
+                        <p class="text-xs text-slate-500">Submit, adjust, or re-bid prices against logged catches</p>
+                    </div>
+                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                        Bidding Open
+                    </span>
+                </div>
+
+                <!-- TOP BID EDIT / SUBMISSION FORM CARD -->
+                <div id="bid-edit-form-card" class="bg-white rounded-2xl p-4 shadow-sm border-2 border-slate-200 transition-all duration-300 space-y-3.5">
+                    <div class="flex justify-between items-center">
+                        <h3 id="bid-form-title" class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <i class="fa-solid fa-gavel text-licious-red"></i>
+                            Submit / Update Bid
+                        </h3>
+                        <span id="editing-bid-badge" class="hidden text-[10px] bg-red-100 text-licious-red font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-pen-to-square"></i> Editing <span id="editing-bid-id">BID-000</span>
+                        </span>
+                    </div>
+
+                    <!-- Select SKU x Grade dropdown populated from Daily Catch Log -->
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">Select SKU x Grade (From Catch Log)</label>
+                        <select id="bid-sku-select" onchange="updateBidFormFromCatch()" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-licious-red">
+                            <!-- Injected dynamically from catch entries -->
+                        </select>
+                    </div>
+
+                    <!-- Base Price Display Card -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+                        <div>
+                            <span class="text-[10px] text-slate-500 font-bold uppercase">Base Price (Logged)</span>
+                            <p id="bid-base-price-display" class="text-base font-extrabold text-slate-800">₹620 <span class="text-xs font-normal text-slate-500">/ kg</span></p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] text-slate-500 font-bold uppercase">Volume</span>
+                            <p id="bid-volume-display" class="text-xs font-bold text-slate-700">150 kg</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Price Adjuster (+10 / -10) -->
+                    <div class="bg-licious-lightRed p-3.5 rounded-xl border border-red-200 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-800">Your Proposed Bid Price:</span>
+                            <span id="bid-delta-badge" class="text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">+₹10 / kg</span>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-3 pt-1">
+                            <!-- Reduce by 10 button -->
+                            <button type="button" onclick="adjustBidPrice(-10)" class="w-12 h-12 rounded-xl bg-white border border-slate-300 shadow-sm text-slate-800 font-bold text-xl hover:bg-slate-100 active:scale-95 transition flex items-center justify-center">
+                                -
+                            </button>
+
+                            <!-- Big Price Display -->
+                            <div class="flex-1 text-center bg-white py-2 rounded-xl border border-red-300 shadow-inner">
+                                <span id="current-bid-price" class="text-2xl font-black text-licious-red">₹630</span>
+                                <span class="text-xs text-slate-500 font-medium"> / kg</span>
+                            </div>
+
+                            <!-- Increase by 10 button -->
+                            <button type="button" onclick="adjustBidPrice(10)" class="w-12 h-12 rounded-xl bg-licious-red text-white shadow-sm font-bold text-xl hover:bg-licious-darkRed active:scale-95 transition flex items-center justify-center">
+                                +
+                            </button>
+                        </div>
+
+                        <!-- Total Bid Calculation preview -->
+                        <div class="flex justify-between items-center text-xs text-slate-600 pt-1 border-t border-red-200/60">
+                            <span>Est. Deal Tonnage Value:</span>
+                            <span id="bid-total-value" class="font-extrabold text-slate-900">₹94,500</span>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button type="button" onclick="submitOrUpdateBid()" id="submit-bid-btn" class="flex-1 bg-slate-900 text-white font-bold py-3 rounded-xl text-xs hover:bg-slate-800 transition shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span id="submit-bid-btn-text">Submit Bid to Area Manager</span>
+                        </button>
+                        <button type="button" id="cancel-re-bid-btn" onclick="cancelRebidMode()" class="hidden bg-slate-200 text-slate-700 font-bold px-3 py-3 rounded-xl text-xs hover:bg-slate-300 transition">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BID WORKFLOW CARDS SECTION -->
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-extrabold text-slate-900 text-sm">Active & Locked Bids</h3>
+                        <span class="text-xs text-slate-500">Live Elapsed Timers</span>
+                    </div>
+
+                    <!-- Workflow Filter Pills -->
+                    <div class="flex gap-1.5 overflow-x-auto no-scrollbar text-xs pb-1">
+                        <button onclick="filterBids('all')" id="filter-all" class="bid-filter-btn bg-slate-900 text-white font-bold px-3 py-1.5 rounded-lg">All</button>
+                        <button onclick="filterBids('awaiting')" id="filter-awaiting" class="bid-filter-btn bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg">Awaiting AM</button>
+                        <button onclick="filterBids('approved')" id="filter-approved" class="bid-filter-btn bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg">Approved</button>
+                        <button onclick="filterBids('locked')" id="filter-locked" class="bid-filter-btn bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-lg">Locked In</button>
+                    </div>
+
+                    <!-- Container for Bid Cards -->
+                    <div id="bid-cards-container" class="space-y-3">
+                        <!-- Bid cards rendered dynamically -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- FLOATING HOVERING LIVE BID BAR (Anchored directly above bottom navigation bar) -->
+        <div id="floating-bid-bar" class="absolute bottom-16 left-3 right-3 z-40 transition-all duration-300 ease-in-out">
+            <!-- Collapsed Bar view -->
+            <div onclick="toggleBidBarExpand()" class="bg-slate-900 text-white rounded-2xl p-3 shadow-2xl border border-slate-700 flex items-center justify-between cursor-pointer bid-bar-shadow">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full pulse-live shrink-0"></div>
+                    <div>
+                        <p id="floating-bar-text" class="text-xs font-extrabold tracking-tight">⚡ 2 Live Bids • 1 Approved awaiting Lock In</p>
+                        <p class="text-[10px] text-slate-400">Tap to quick-manage, re-bid or lock in deals</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button id="bid-bar-chevron" class="text-slate-400 text-xs w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center">
+                        <i class="fa-solid fa-chevron-up"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Expanded Quick Action Panel -->
+            <div id="floating-bid-panel" class="bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-t-none rounded-b-2xl p-3 text-white hidden space-y-2 border-t-0 shadow-xl">
+                <div id="floating-panel-items" class="space-y-2 max-h-40 overflow-y-auto no-scrollbar text-xs">
+                    <!-- Dynamic mini bid items inserted here -->
+                </div>
+                <button onclick="switchTab('tab-6'); toggleBidBarExpand(false);" class="w-full bg-licious-red text-white py-1.5 rounded-lg text-xs font-bold text-center">
+                    Open Full Live Bid Portal &rarr;
+                </button>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAVIGATION BAR (6 Tabs) -->
+        <nav class="bg-slate-900 text-slate-400 border-t border-slate-800 flex justify-around items-center px-1 py-2 z-40 absolute bottom-0 left-0 right-0 h-16">
+            <button onclick="switchTab('tab-1')" id="nav-tab-1" class="nav-btn active flex flex-col items-center justify-center w-full text-licious-red">
+                <i class="fa-solid fa-trophy text-base"></i>
+                <span class="text-[9px] font-bold mt-1">Score</span>
+            </button>
+            <button onclick="switchTab('tab-2')" id="nav-tab-2" class="nav-btn flex flex-col items-center justify-center w-full hover:text-white">
+                <i class="fa-solid fa-hand-holding-dollar text-base"></i>
+                <span class="text-[9px] font-bold mt-1">Incentive</span>
+            </button>
+            <button onclick="switchTab('tab-3')" id="nav-tab-3" class="nav-btn flex flex-col items-center justify-center w-full hover:text-white">
+                <i class="fa-solid fa-fish text-base"></i>
+                <span class="text-[9px] font-bold mt-1">Catch Log</span>
+            </button>
+            <button onclick="switchTab('tab-4')" id="nav-tab-4" class="nav-btn flex flex-col items-center justify-center w-full hover:text-white">
+                <i class="fa-solid fa-clipboard-check text-base"></i>
+                <span class="text-[9px] font-bold mt-1">Grading</span>
+            </button>
+            <button onclick="switchTab('tab-5')" id="nav-tab-5" class="nav-btn flex flex-col items-center justify-center w-full hover:text-white">
+                <i class="fa-solid fa-comment-dots text-base"></i>
+                <span class="text-[9px] font-bold mt-1">Feedback</span>
+            </button>
+            <button onclick="switchTab('tab-6')" id="nav-tab-6" class="nav-btn flex flex-col items-center justify-center w-full hover:text-white relative">
+                <i class="fa-solid fa-gavel text-base"></i>
+                <span class="text-[9px] font-bold mt-1">Live Bid</span>
+                <span class="absolute top-0 right-3 w-2 h-2 bg-licious-red rounded-full"></span>
+            </button>
+        </nav>
+
+        <!-- MODALS -->
+
+        <!-- 1. Tier Matrix Modal -->
+        <div id="tier-matrix-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-2xl relative">
+                <button onclick="toggleTierMatrixModal(false)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-crown text-amber-500"></i>
+                    Score-to-Tier Matrix
+                </h3>
+                <div class="space-y-2 text-xs">
+                    <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 space-y-1">
+                        <div class="flex justify-between font-bold text-amber-900">
+                            <span>Platinum Tier (91 - 100)</span>
+                            <span>Highest Priority Unloading</span>
+                        </div>
+                        <p class="text-amber-700">0% dock deduction + ₹15/kg bonus on Grade A+ fish.</p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-yellow-50 border border-yellow-200 space-y-1">
+                        <div class="flex justify-between font-bold text-yellow-900">
+                            <span>Gold Tier (71 - 90)</span>
+                            <span class="text-licious-red font-extrabold">&larr; Your Current Tier</span>
+                        </div>
+                        <p class="text-yellow-800">Priority unloading slot + ₹8/kg incentive payout.</p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-100 border border-slate-200 space-y-1">
+                        <div class="flex justify-between font-bold text-slate-700">
+                            <span>Silver Tier (41 - 70)</span>
+                            <span>Standard Slot</span>
+                        </div>
+                        <p class="text-slate-600">Standard unloading queue + base catch rate payout.</p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-100 border border-slate-200 space-y-1">
+                        <div class="flex justify-between font-bold text-slate-700">
+                            <span>Iron Tier (0 - 40)</span>
+                            <span>Basic Priority</span>
+                        </div>
+                        <p class="text-slate-600">Standard queue with basic quality audit requirements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Section Score Detail Modal -->
+        <div id="score-detail-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-3 shadow-2xl relative">
+                <button onclick="toggleScoreDetailModal(false)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <h3 id="score-detail-title" class="font-extrabold text-slate-900 text-sm">Metric Detail</h3>
+                <div id="score-detail-body" class="text-xs text-slate-600 space-y-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Incentive Rule Matrix Modal -->
+        <div id="incentive-matrix-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-3 shadow-2xl relative">
+                <button onclick="toggleIncentiveMatrixModal(false)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-calculator text-emerald-600"></i>
+                    Weekly Bonus Calculation Rules
+                </h3>
+                <div class="space-y-2 text-xs text-slate-700">
+                    <p class="text-slate-500">Incentives are auto-calculated every Sunday midnight based on 3 core factors:</p>
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                        <span class="font-bold text-slate-900">1. On-Time Pickup (40% weight)</span>
+                        <p class="text-[11px] text-slate-600">Vessel unloads at jetty within 30 mins of declared ETA.</p>
+                    </div>
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                        <span class="font-bold text-slate-900">2. Grade Accuracy (35% weight)</span>
+                        <p class="text-[11px] text-slate-600">Promised grade matching Licious lab check at landing.</p>
+                    </div>
+                    <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200">
+                        <span class="font-bold text-slate-900">3. Fill-Rate Percentage (25% weight)</span>
+                        <p class="text-[11px] text-slate-600">Ratio of contracted catch volume vs actual landed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Mismatch Detail Modal -->
+        <div id="mismatch-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-3 shadow-2xl relative">
+                <button onclick="toggleMismatchModal(false)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <h3 class="font-extrabold text-amber-900 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+                    Grading Mismatch Report
+                </h3>
+                <div class="bg-amber-50 p-3 rounded-xl border border-amber-200 text-xs space-y-1.5 text-slate-800">
+                    <p><strong>Batch ID:</strong> #K-409 (Mangalore Jetty)</p>
+                    <p><strong>Fish SKU:</strong> Kingfish / Surmai</p>
+                    <p><strong>Logged by Supplier:</strong> Grade A+ (180 kg)</p>
+                    <p><strong>Licious QC Audit:</strong> Grade A (Minor skin scrape on 12% sample)</p>
+                    <p><strong>Impact:</strong> Adjusted payout rate: ₹610 / kg (vs ₹630 / kg logged).</p>
+                </div>
+                <button onclick="toggleMismatchModal(false)" class="w-full bg-slate-800 text-white py-2 rounded-xl text-xs font-bold">
+                    Acknowledge & Close
+                </button>
+            </div>
+        </div>
+
+        <!-- 5. Profile Modal (Gmail-style) -->
+        <div id="profile-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4 shadow-2xl relative text-center">
+                <button onclick="toggleProfileModal(false)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                
+                <div class="w-16 h-16 rounded-full bg-licious-red text-white font-black text-2xl flex items-center justify-center mx-auto shadow-lg border-2 border-white">
+                    MS
+                </div>
+
+                <div>
+                    <h3 class="font-extrabold text-slate-900 text-base">Mangalore Sea Catch Ltd.</h3>
+                    <p class="text-xs text-slate-500">Supplier ID: #LIC-MNG-9042</p>
+                    <span class="inline-block mt-1 bg-amber-100 text-amber-800 font-bold text-[10px] px-2.5 py-0.5 rounded-full border border-amber-300">
+                        Gold Tier Partner
+                    </span>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs text-left space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Dock Port:</span>
+                        <span class="font-bold text-slate-800">Mangalore Old Port Jetty</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Area Manager:</span>
+                        <span class="font-bold text-slate-800">Rajesh Kumar (+91 98765 43210)</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">GSTIN Registered:</span>
+                        <span class="font-bold text-emerald-600">Verified ✓</span>
+                    </div>
+                </div>
+
+                <button onclick="toggleProfileModal(false)" class="w-full bg-slate-900 text-white py-2 rounded-xl text-xs font-bold hover:bg-slate-800">
+                    Close
+                </button>
+            </div>
+        </div>
+
+        <!-- 6. Notification Modal -->
+        <div id="notification-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-3 shadow-2xl relative">
+                <button onclick="toggleNotificationModal(false)" class="absolute top-3 right-3 text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+                <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                    <i class="fa-solid fa-bell text-licious-red"></i>
+                    Supplier Notifications
+                </h3>
+                <div class="space-y-2 text-xs">
+                    <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="font-bold text-slate-800">AM Approved Live Bid!</span>
+                        <p class="text-[11px] text-slate-500">White Pomfret @ ₹780/kg approved by Area Manager.</p>
+                        <span class="text-[10px] text-slate-400">10 mins ago</span>
+                    </div>
+                    <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <span class="font-bold text-slate-800">Weekly Payout Settled</span>
+                        <p class="text-[11px] text-slate-500">₹2,450 bonus queued for Monday transfer.</p>
+                        <span class="text-[10px] text-slate-400">2 hours ago</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Message Notification Popup -->
+        <div id="toast" class="absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl border border-slate-700 flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-2">
+            <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+            <span id="toast-msg">Action performed successfully</span>
+        </div>
+
+    </div>
+
+    <script>
+        // APP STATE DATA
+        
+        // Tab 1: Section Scores Data
+        const sectionScores = [
+            { name: "Price Score", weight: "25%", score: 92, status: "Excellent", desc: "Your average logged base price vs regional mandi benchmarks." },
+            { name: "Fill Rate", weight: "20%", score: 85, status: "Good", desc: "Ratio of promised catch quantity delivered to Licious center." },
+            { name: "Quality", weight: "20%", score: 90, status: "Excellent", desc: "Accuracy of your grade grading vs Licious QC audit check." },
+            { name: "SKU Spread", weight: "15%", score: 80, status: "Good", desc: "Variety of seawater species supplied (Pomfret, Kingfish, Snapper)." },
+            { name: "Scale (Qty/SKU)", weight: "10%", score: 86, status: "Good", desc: "Total tonnage supplied per SKU in current trailing window." },
+            { name: "Attendance", weight: "10%", score: 95, status: "Excellent", desc: "Days on which supplier was available and landed fish at dock." }
+        ];
+
+        // Tab 3: Pre-populated Catch Log Items (with Base Price)
+        let catchLogs = [
+            { id: 101, sku: "Kingfish / Surmai", grade: "Grade A+", qty: 150, basePrice: 620, time: "07:30 AM" },
+            { id: 102, sku: "White Pomfret", grade: "Grade A", qty: 80, basePrice: 770, time: "08:15 AM" },
+            { id: 103, sku: "Red Snapper", grade: "Grade B", qty: 200, basePrice: 410, time: "08:45 AM" }
+        ];
+
+        // Tab 6: Live Bids Data with status workflow & timestamps
+        let liveBids = [
+            {
+                id: "BID-881",
+                catchId: 101,
+                sku: "Kingfish / Surmai",
+                grade: "Grade A+",
+                qty: 150,
+                basePrice: 620,
+                bidPrice: 630,
+                status: "awaiting", // awaiting, approved, locked
+                submittedTime: Date.now() - (4 * 60 + 12) * 1000 // 4 mins 12 secs ago
+            },
+            {
+                id: "BID-882",
+                catchId: 102,
+                sku: "White Pomfret",
+                grade: "Grade A",
+                qty: 80,
+                basePrice: 770,
+                bidPrice: 780,
+                status: "approved",
+                submittedTime: Date.now() - (18 * 60 + 45) * 1000,
+                approvedTime: Date.now() - (5 * 60) * 1000
+            },
+            {
+                id: "BID-880",
+                catchId: 103,
+                sku: "Red Snapper",
+                grade: "Grade B",
+                qty: 200,
+                basePrice: 410,
+                bidPrice: 410,
+                status: "locked",
+                submittedTime: Date.now() - (95 * 60) * 1000,
+                lockedTime: "08:10 AM"
+            }
+        ];
+
+        let activeEditingBidId = null; // Stores bid ID if currently in Re-bid mode
+        let selectedBidAdjustPrice = 630;
+        let selectedStarRating = 0;
+        let isBidBarExpanded = false;
+
+        window.onload = function() {
+            startClock();
+            renderSectionScores();
+            renderCatchLogs();
+            populateBidSkuDropdown();
+            renderLiveBids();
+            updateFloatingBidBar();
+            initGradingWizard();
+
+            // Start 1-second interval to update live elapsed timer counters
+            setInterval(updateLiveCounters, 1000);
+        };
+
+        // Live status bar clock
+        function startClock() {
+            function updateTime() {
+                const now = new Date();
+                let hours = now.getHours();
+                let minutes = now.getMinutes();
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                document.getElementById('live-clock-time').textContent = hours + ':' + minutes + ' ' + ampm;
+            }
+            updateTime();
+            setInterval(updateTime, 10000);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-licious-red');
+                btn.classList.add('hover:text-white', 'text-slate-400');
+            });
+
+            const navIndex = tabId.replace('tab-', '');
+            const activeNav = document.getElementById(`nav-tab-${navIndex}`);
+            if (activeNav) {
+                activeNav.classList.add('text-licious-red');
+                activeNav.classList.remove('text-slate-400');
+            }
+        }
+
+        function renderSectionScores() {
+            const container = document.getElementById('tier-score-rows');
+            container.innerHTML = sectionScores.map((item, idx) => `
+                <div onclick="openScoreDetail(${idx})" class="p-2.5 rounded-xl bg-slate-50 hover:bg-slate-100/80 transition cursor-pointer flex items-center justify-between border border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center font-bold text-xs">
+                            ${item.score}
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-800">${item.name}</p>
+                            <span class="text-[10px] text-slate-500">Weightage: ${item.weight}</span>
+                        </div>
+                    </div>
+                    <div class="text-right flex items-center gap-2">
+                        <span class="text-[11px] font-bold ${item.score >= 90 ? 'text-emerald-600' : 'text-amber-600'}">${item.status}</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openScoreDetail(idx) {
+            const item = sectionScores[idx];
+            document.getElementById('score-detail-title').textContent = item.name + ` (${item.score}/100)`;
+            document.getElementById('score-detail-body').innerHTML = `
+                <div class="p-3 bg-slate-50 rounded-xl space-y-2">
+                    <p class="font-semibold text-slate-800">Weight in Tier Matrix: <span class="text-licious-red font-bold">${item.weight}</span></p>
+                    <p class="text-slate-600">${item.desc}</p>
+                    <div class="pt-2 border-t border-slate-200 flex justify-between text-[11px]">
+                        <span>Regional Benchmark: <strong>82/100</strong></span>
+                        <span class="text-emerald-600 font-bold">+${item.score - 82} Above Avg</span>
+                    </div>
+                </div>
+            `;
+            toggleScoreDetailModal(true);
+        }
+
+        function toggleScoreDetailModal(show) {
+            document.getElementById('score-detail-modal').classList.toggle('hidden', !show);
+        }
+
+        function toggleTierMatrixModal(show) {
+            document.getElementById('tier-matrix-modal').classList.toggle('hidden', !show);
+        }
+
+        function toggleIncentiveMatrixModal(show) {
+            document.getElementById('incentive-matrix-modal').classList.toggle('hidden', !show);
+        }
+
+        function toggleMismatchModal(show) {
+            document.getElementById('mismatch-modal').classList.toggle('hidden', !show);
+        }
+
+        function toggleProfileModal(show) {
+            document.getElementById('profile-modal').classList.toggle('hidden', !show);
+        }
+
+        function openMismatchModal() {
+            toggleMismatchModal(true);
+        }
+
+        function toggleNotificationModal(show) {
+            document.getElementById('notification-modal').classList.toggle('hidden', !show);
+        }
+
+        function renderCatchLogs() {
+            const tbody = document.getElementById('catch-log-tbody');
+            document.getElementById('catch-count-badge').textContent = `${catchLogs.length} Items`;
+
+            tbody.innerHTML = catchLogs.map(item => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-2.5">
+                        <div class="font-bold text-slate-800">${item.sku}</div>
+                        <span class="inline-block text-[10px] px-1.5 py-0.2 rounded font-semibold ${item.grade.includes('A+') ? 'bg-emerald-100 text-emerald-800' : item.grade.includes('A') ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800'}">
+                            ${item.grade}
+                        </span>
+                        <span class="text-[10px] text-slate-400 ml-1">${item.time}</span>
+                    </td>
+                    <td class="py-2.5 text-right font-extrabold text-slate-900">${item.qty} kg</td>
+                    <td class="py-2.5 text-right font-black text-licious-red">₹${item.basePrice}</td>
+                    <td class="py-2.5 text-right">
+                        <button onclick="quickBidFromCatch(${item.id})" class="text-[10px] bg-slate-900 text-white font-bold px-2 py-1 rounded hover:bg-slate-800 transition">
+                            Bid &rarr;
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function handleCatchSubmit(e) {
+            e.preventDefault();
+            const sku = document.getElementById('catch-sku').value;
+            const grade = document.getElementById('catch-grade').value;
+            const qty = parseInt(document.getElementById('catch-qty').value);
+            const basePrice = parseInt(document.getElementById('catch-base-price').value);
+
+            const newItem = {
+                id: Date.now(),
+                sku,
+                grade,
+                qty,
+                basePrice,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            catchLogs.unshift(newItem);
+            renderCatchLogs();
+            populateBidSkuDropdown();
+            showToast(`Logged ${qty}kg ${sku} @ ₹${basePrice}/kg`);
+
+            // Reset form inputs
+            document.getElementById('catch-qty').value = '';
+            document.getElementById('catch-base-price').value = '';
+        }
+
+        function simulateVoiceDictation() {
+            const btn = document.getElementById('mic-btn');
+            btn.classList.add('animate-pulse', 'bg-red-200');
+            showToast('🎙️ Listening... "Kingfish 120 kg Grade A Base Price 640"');
+            setTimeout(() => {
+                btn.classList.remove('animate-pulse', 'bg-red-200');
+                document.getElementById('catch-sku').value = 'Kingfish / Surmai';
+                document.getElementById('catch-grade').value = 'Grade A+';
+                document.getElementById('catch-qty').value = '120';
+                document.getElementById('catch-base-price').value = '640';
+                showToast('Voice dictation parsed into form!');
+            }, 1800);
+        }
+
+        function simulateImageScan() {
+            showToast('📷 Scanning fish landing photo...');
+            setTimeout(() => {
+                document.getElementById('catch-sku').value = 'White Pomfret';
+                document.getElementById('catch-grade').value = 'Grade A';
+                document.getElementById('catch-qty').value = '95';
+                document.getElementById('catch-base-price').value = '790';
+                showToast('AI Scanner: Identified White Pomfret (Grade A)');
+            }, 1500);
+        }
+
+        function parseDemoCSV() {
+            showToast('📄 Parsing boat manifest CSV...');
+            setTimeout(() => {
+                catchLogs.push({ id: Date.now() + 1, sku: "Seer Fish", grade: "Grade A", qty: 110, basePrice: 580, time: "09:00 AM" });
+                renderCatchLogs();
+                populateBidSkuDropdown();
+                showToast('Imported 1 manifest row from CSV');
+            }, 1000);
+        }
+
+        const gradingQuestions = [
+            { id: 1, text: "1. Eye Clarity & Contour", options: ["Clear, convex, glossy (+A+)", "Slightly flat, minor haziness (+A)", "Cloudy, sunken (+B)"], weights: [3, 2, 1] },
+            { id: 2, text: "2. Gill Color & Odor", options: ["Bright red/maroon, fresh sea scent (+A+)", "Pinkish-red, neutral (+A)", "Brownish/dull, strong fish odor (+B)"], weights: [3, 2, 1] },
+            { id: 3, text: "3. Flesh Elasticity (Pressure test)", options: ["Firm, immediate recoil (+A+)", "Slight indentation recovers (+A)", "Soft, finger indent remains (+B)"], weights: [3, 2, 1] },
+            { id: 4, text: "4. Skin Sheen & Scales", options: ["Lustrous sheen, scales intact (+A+)", "Moderate sheen (+A)", "Dull skin, loose scales (+B)"], weights: [3, 2, 1] },
+            { id: 5, text: "5. Internal Core Temp at Landing", options: ["<= 2.0 °C Slush Ice (+A+)", "2.1°C - 4.0 °C (+A)", "> 4.0 °C (+B)"], weights: [3, 2, 1] },
+            { id: 6, text: "6. Piece Weight Uniformity", options: ["Consistent export size (+A+)", "Minor variance <= 10% (+A)", "High variance (+B)"], weights: [3, 2, 1] }
+        ];
+
+        let gradingAnswers = {};
+
+        function initGradingWizard() {
+            const container = document.getElementById('grading-wizard-container');
+            container.innerHTML = gradingQuestions.map(q => `
+                <div class="space-y-1.5">
+                    <p class="text-xs font-bold text-slate-800">${q.text}</p>
+                    <div class="grid grid-cols-1 gap-1">
+                        ${q.options.map((opt, oIdx) => `
+                            <label class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs cursor-pointer hover:bg-slate-100">
+                                <input type="radio" name="g_q_${q.id}" value="${q.weights[oIdx]}" onchange="recordGradingAnswer(${q.id}, ${q.weights[oIdx]})" class="accent-licious-red">
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function recordGradingAnswer(qId, val) {
+            gradingAnswers[qId] = val;
+            if (Object.keys(gradingAnswers).length === 6) {
+                calculateGradingResult();
+            }
+        }
+
+        function calculateGradingResult() {
+            let total = 0;
+            Object.values(gradingAnswers).forEach(v => total += v);
+
+            const resultBox = document.getElementById('grading-result-box');
+            resultBox.classList.remove('hidden');
+
+            let gradeResult = "Grade A";
+            let colorClass = "text-blue-700 bg-blue-50 border-blue-200";
+
+            if (total >= 16) {
+                gradeResult = "Grade A+ (Premium Export)";
+                colorClass = "text-emerald-800 bg-emerald-50 border-emerald-200";
+            } else if (total <= 10) {
+                gradeResult = "Grade B (Processing)";
+                colorClass = "text-amber-800 bg-amber-50 border-amber-200";
+            }
+
+            resultBox.className = `mt-4 p-3 rounded-xl border ${colorClass} space-y-1`;
+            resultBox.innerHTML = `
+                <div class="flex justify-between items-center font-bold text-xs">
+                    <span>Evaluated Result:</span>
+                    <span class="text-sm uppercase tracking-wide font-black">${gradeResult}</span>
+                </div>
+                <p class="text-[11px] opacity-90">Score: ${total} / 18 pts. Meets Licious quality standard for live bidding.</p>
+            `;
+        }
+
+        function resetGradingWizard() {
+            gradingAnswers = {};
+            initGradingWizard();
+            document.getElementById('grading-result-box').classList.add('hidden');
+        }
+
+        function setStarRating(stars) {
+            selectedStarRating = stars;
+            const buttons = document.querySelectorAll('.star-btn');
+            const labels = ["Poor", "Fair", "Good", "Very Good", "Excellent Landing!"];
+            
+            buttons.forEach((btn, i) => {
+                if (i < stars) {
+                    btn.classList.add('text-amber-400');
+                    btn.classList.remove('text-slate-300');
+                } else {
+                    btn.classList.remove('text-amber-400');
+                    btn.classList.add('text-slate-300');
+                }
+            });
+
+            document.getElementById('star-label').textContent = `${stars} / 5 Stars - ${labels[stars - 1]}`;
+            document.getElementById('star-label').classList.add('text-amber-600');
+        }
+
+        function simulateVoiceFeedback() {
+            showToast('🎙️ Recording voice feedback...');
+            setTimeout(() => {
+                document.getElementById('feedback-comments').value = "Ice slurry at Mangalore Jetty was ready on time. Offloading completed in 20 mins.";
+                setStarRating(5);
+                showToast('Voice transcribed into text!');
+            }, 1200);
+        }
+
+        function handleFeedbackSubmit(e) {
+            e.preventDefault();
+            if (selectedStarRating === 0) {
+                showToast('Please select a star rating first!', true);
+                return;
+            }
+            document.getElementById('feedback-form-card').classList.add('hidden');
+            document.getElementById('feedback-locked-card').classList.remove('hidden');
+            showToast('Feedback submitted successfully!');
+        }
+
+        function resetFeedbackDemo() {
+            document.getElementById('feedback-form-card').classList.remove('hidden');
+            document.getElementById('feedback-locked-card').classList.add('hidden');
+            setStarRating(0);
+            document.getElementById('feedback-comments').value = '';
+            document.getElementById('star-label').textContent = 'Tap a star to rate';
+        }
+
+        function populateBidSkuDropdown() {
+            const select = document.getElementById('bid-sku-select');
+            if (!select) return;
+
+            select.innerHTML = catchLogs.map(c => `
+                <option value="${c.id}">${c.sku} (${c.grade}) - ${c.qty} kg [Base: ₹${c.basePrice}]</option>
+            `).join('');
+
+            updateBidFormFromCatch();
+        }
+
+        function updateBidFormFromCatch() {
+            const select = document.getElementById('bid-sku-select');
+            if (!select || !select.value) return;
+
+            const catchId = parseInt(select.value);
+            const catchItem = catchLogs.find(c => c.id === catchId);
+            if (!catchItem) return;
+
+            document.getElementById('bid-base-price-display').innerHTML = `₹${catchItem.basePrice} <span class="text-xs font-normal text-slate-500">/ kg</span>`;
+            document.getElementById('bid-volume-display').textContent = `${catchItem.qty} kg`;
+
+            if (!activeEditingBidId) {
+                // Default new bid price = base price + 10
+                selectedBidAdjustPrice = catchItem.basePrice + 10;
+            }
+            updateBidPriceUI(catchItem.basePrice, catchItem.qty);
+        }
+
+        function adjustBidPrice(delta) {
+            const select = document.getElementById('bid-sku-select');
+            const catchId = parseInt(select.value);
+            const catchItem = catchLogs.find(c => c.id === catchId) || { basePrice: 600, qty: 100 };
+
+            selectedBidAdjustPrice += delta;
+            // Prevent dropping below base price - 50
+            if (selectedBidAdjustPrice < catchItem.basePrice - 50) {
+                selectedBidAdjustPrice = catchItem.basePrice - 50;
+            }
+
+            updateBidPriceUI(catchItem.basePrice, catchItem.qty);
+        }
+
+        function updateBidPriceUI(basePrice, qty) {
+            document.getElementById('current-bid-price').textContent = `₹${selectedBidAdjustPrice}`;
+            
+            const diff = selectedBidAdjustPrice - basePrice;
+            const badge = document.getElementById('bid-delta-badge');
+
+            if (diff >= 0) {
+                badge.className = "text-[10px] font-extrabold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full";
+                badge.textContent = `+₹${diff} / kg over base`;
+            } else {
+                badge.className = "text-[10px] font-extrabold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full";
+                badge.textContent = `-₹${Math.abs(diff)} / kg below base`;
+            }
+
+            const total = selectedBidAdjustPrice * qty;
+            document.getElementById('bid-total-value').textContent = `₹${total.toLocaleString('en-IN')}`;
+        }
+
+        // TRIGGER RE-BID MODE WHEN TAPPING CARD OR RE-BID BUTTON
+        function triggerRebidMode(bidId) {
+            switchTab('tab-6');
+            const bid = liveBids.find(b => b.id === bidId);
+            if (!bid) return;
+
+            activeEditingBidId = bidId;
+
+            // Set dropdown SKU
+            const select = document.getElementById('bid-sku-select');
+            if (bid.catchId) {
+                select.value = bid.catchId;
+            }
+
+            selectedBidAdjustPrice = bid.bidPrice;
+            updateBidFormFromCatch();
+
+            // Update Form UI state for editing mode
+            document.getElementById('editing-bid-badge').classList.remove('hidden');
+            document.getElementById('editing-bid-id').textContent = bid.id;
+            document.getElementById('submit-bid-btn-text').textContent = `Update & Re-submit Bid ${bid.id}`;
+            document.getElementById('cancel-re-bid-btn').classList.remove('hidden');
+
+            // Scroll up to the bid edit form smoothly
+            const formCard = document.getElementById('bid-edit-form-card');
+            formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Trigger visual highlight animation
+            formCard.classList.add('rebid-active-form');
+            setTimeout(() => {
+                formCard.classList.remove('rebid-active-form');
+            }, 3000);
+
+            showToast(`Re-bid Mode: Editing ${bid.id}. Adjust price & submit.`);
+        }
+
+        function cancelRebidMode() {
+            activeEditingBidId = null;
+            document.getElementById('editing-bid-badge').classList.add('hidden');
+            document.getElementById('submit-bid-btn-text').textContent = `Submit Bid to Area Manager`;
+            document.getElementById('cancel-re-bid-btn').classList.add('hidden');
+            updateBidFormFromCatch();
+        }
+
+        function submitOrUpdateBid() {
+            const select = document.getElementById('bid-sku-select');
+            const catchId = parseInt(select.value);
+            const catchItem = catchLogs.find(c => c.id === catchId);
+            if (!catchItem) return;
+
+            if (activeEditingBidId) {
+                // UPDATE EXISTING BID (RE-BID)
+                const existingBid = liveBids.find(b => b.id === activeEditingBidId);
+                if (existingBid) {
+                    existingBid.bidPrice = selectedBidAdjustPrice;
+                    existingBid.status = 'awaiting'; // Reset status back to awaiting AM approval
+                    existingBid.submittedTime = Date.now(); // Reset elapsed timer
+                    showToast(`Updated ${existingBid.id} to ₹${selectedBidAdjustPrice}/kg! Moved to Awaiting AM.`);
+                }
+                cancelRebidMode();
+            } else {
+                // SUBMIT NEW BID
+                const newBid = {
+                    id: `BID-${Math.floor(100 + Math.random() * 900)}`,
+                    catchId: catchItem.id,
+                    sku: catchItem.sku,
+                    grade: catchItem.grade,
+                    qty: catchItem.qty,
+                    basePrice: catchItem.basePrice,
+                    bidPrice: selectedBidAdjustPrice,
+                    status: 'awaiting',
+                    submittedTime: Date.now()
+                };
+
+                liveBids.unshift(newBid);
+                showToast(`Submitted ${newBid.id} for Area Manager Approval!`);
+            }
+
+            renderLiveBids();
+            updateFloatingBidBar();
+        }
+
+        function quickBidFromCatch(catchId) {
+            switchTab('tab-6');
+            cancelRebidMode();
+            const select = document.getElementById('bid-sku-select');
+            select.value = catchId;
+            updateBidFormFromCatch();
+        }
+
+        // AM Approval simulation function
+        function simulateAMApproval(bidId, event) {
+            if (event) event.stopPropagation();
+            const bid = liveBids.find(b => b.id === bidId);
+            if (bid) {
+                bid.status = 'approved';
+                bid.approvedTime = Date.now();
+                renderLiveBids();
+                updateFloatingBidBar();
+                showToast(`AM Approved ${bid.id}! Ready for Lock In.`);
+            }
+        }
+
+        // Lock in deal function (Callable even when awaiting approval)
+        function markAsLockedIn(bidId, event) {
+            if (event) event.stopPropagation();
+            const bid = liveBids.find(b => b.id === bidId);
+            if (bid) {
+                bid.status = 'locked';
+                bid.lockedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                // If we were editing this bid, reset form edit state
+                if (activeEditingBidId === bidId) {
+                    cancelRebidMode();
+                }
+
+                renderLiveBids();
+                updateFloatingBidBar();
+                showToast(`🔒 Deal ${bid.id} locked in successfully!`);
+            }
+        }
+
+        let currentBidFilter = 'all';
+
+        function filterBids(filter) {
+            currentBidFilter = filter;
+            document.querySelectorAll('.bid-filter-btn').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white');
+                btn.classList.add('bg-slate-200', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById(`filter-${filter}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-slate-900', 'text-white');
+                activeBtn.classList.remove('bg-slate-200', 'text-slate-700');
+            }
+            renderLiveBids();
+        }
+
+        function formatElapsed(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const pad = num => num < 10 ? '0' + num : num;
+            return `${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        function renderLiveBids() {
+            const container = document.getElementById('bid-cards-container');
+            
+            const filtered = liveBids.filter(b => {
+                if (currentBidFilter === 'all') return true;
+                return b.status === currentBidFilter;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 bg-white rounded-2xl border border-slate-200">
+                        <i class="fa-solid fa-folder-open text-slate-300 text-3xl mb-2"></i>
+                        <p class="text-xs text-slate-500 font-bold">No bids in this status category</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(bid => {
+                const elapsedStr = formatElapsed(Date.now() - bid.submittedTime);
+
+                let statusBadge = '';
+                let borderClass = '';
+                let actionSection = '';
+
+                const canRebid = bid.status === 'awaiting' || bid.status === 'approved';
+
+                if (bid.status === 'awaiting') {
+                    borderClass = 'border-amber-300 bg-amber-50/40 hover:bg-amber-100/50 cursor-pointer';
+                    statusBadge = `
+                        <span class="bg-amber-100 text-amber-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-hourglass-half animate-spin text-[9px]"></i> Awaiting AM
+                        </span>
+                    `;
+                    actionSection = `
+                        <div class="pt-2 border-t border-slate-200 flex items-center justify-between gap-1.5">
+                            <button onclick="triggerRebidMode('${bid.id}')" class="bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-pen-to-square"></i> Re-bid
+                            </button>
+
+                            <button onclick="markAsLockedIn('${bid.id}', event)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-extrabold px-2.5 py-1.5 rounded-lg shadow transition flex items-center gap-1">
+                                <i class="fa-solid fa-lock text-[9px]"></i> Lock In
+                            </button>
+
+                            <button onclick="simulateAMApproval('${bid.id}', event)" class="bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold px-2 py-1.5 rounded-lg transition">
+                                Simulate AM ✓
+                            </button>
+                        </div>
+                    `;
+                } else if (bid.status === 'approved') {
+                    borderClass = 'border-emerald-400 bg-emerald-50/50 hover:bg-emerald-100/60 cursor-pointer';
+                    statusBadge = `
+                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check text-emerald-600"></i> AM Approved
+                        </span>
+                    `;
+                    actionSection = `
+                        <div class="pt-2 border-t border-emerald-200 flex items-center justify-between gap-2">
+                            <button onclick="triggerRebidMode('${bid.id}')" class="bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg transition flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-pen-to-square"></i> Re-bid
+                            </button>
+
+                            <button onclick="markAsLockedIn('${bid.id}', event)" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-extrabold px-3 py-1.5 rounded-lg shadow transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-lock text-[10px]"></i> Mark as Locked In
+                            </button>
+                        </div>
+                    `;
+                } else if (bid.status === 'locked') {
+                    borderClass = 'border-slate-300 bg-slate-900 text-white';
+                    statusBadge = `
+                        <span class="bg-emerald-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-lock"></i> Deal Locked In
+                        </span>
+                    `;
+                    actionSection = `
+                        <div class="pt-2 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-400">
+                            <span>Locked at: ${bid.lockedTime || '08:10 AM'}</span>
+                            <span class="text-emerald-400 font-bold">Contract Finalized ✓</span>
+                        </div>
+                    `;
+                }
+
+                const isDark = bid.status === 'locked';
+
+                return `
+                    <div ${canRebid ? `onclick="triggerRebidMode('${bid.id}')"` : ''} class="p-3.5 rounded-2xl border ${borderClass} shadow-sm space-y-2.5 relative transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-mono font-bold ${isDark ? 'text-slate-400' : 'text-slate-500'}">${bid.id}</span>
+                                <h4 class="font-extrabold text-sm ${isDark ? 'text-white' : 'text-slate-900'}">${bid.sku} <span class="text-xs font-normal">(${bid.grade})</span></h4>
+                            </div>
+                            <div class="text-right">
+                                ${statusBadge}
+                                <div class="text-[10px] ${isDark ? 'text-slate-400' : 'text-slate-500'} font-mono mt-1" id="timer-${bid.id}">
+                                    Elapsed: ${elapsedStr}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 py-1.5 px-2.5 ${isDark ? 'bg-slate-800/80 border border-slate-700' : 'bg-white border border-slate-200'} rounded-xl text-xs">
+                            <div>
+                                <span class="text-[9px] uppercase font-bold text-slate-400">Base Price</span>
+                                <p class="font-extrabold ${isDark ? 'text-slate-200' : 'text-slate-700'}">₹${bid.basePrice}/kg</p>
+                            </div>
+                            <div>
+                                <span class="text-[9px] uppercase font-bold text-slate-400">Bid Price</span>
+                                <p class="font-black ${isDark ? 'text-emerald-400' : 'text-licious-red'}">₹${bid.bidPrice}/kg</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[9px] uppercase font-bold text-slate-400">Volume</span>
+                                <p class="font-extrabold ${isDark ? 'text-white' : 'text-slate-900'}">${bid.qty} kg</p>
+                            </div>
+                        </div>
+
+                        ${actionSection}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Live Timer updating function called every second
+        function updateLiveCounters() {
+            liveBids.forEach(bid => {
+                const timerEl = document.getElementById(`timer-${bid.id}`);
+                if (timerEl) {
+                    const elapsed = formatElapsed(Date.now() - bid.submittedTime);
+                    timerEl.textContent = `Elapsed: ${elapsed}`;
+                }
+            });
+        }
+
+        function toggleBidBarExpand(forceState) {
+            if (typeof forceState === 'boolean') {
+                isBidBarExpanded = forceState;
+            } else {
+                isBidBarExpanded = !isBidBarExpanded;
+            }
+
+            const panel = document.getElementById('floating-bid-panel');
+            const chevron = document.getElementById('bid-bar-chevron');
+
+            if (isBidBarExpanded) {
+                panel.classList.remove('hidden');
+                chevron.innerHTML = '<i class="fa-solid fa-chevron-down"></i>';
+            } else {
+                panel.classList.add('hidden');
+                chevron.innerHTML = '<i class="fa-solid fa-chevron-up"></i>';
+            }
+        }
+
+        function updateFloatingBidBar() {
+            const activeBids = liveBids.filter(b => b.status === 'awaiting' || b.status === 'approved');
+            const approvedCount = liveBids.filter(b => b.status === 'approved').length;
+
+            const barText = document.getElementById('floating-bar-text');
+            barText.textContent = `⚡ ${activeBids.length} Active Bids • ${approvedCount} Approved awaiting Lock In`;
+
+            const panelItems = document.getElementById('floating-panel-items');
+            if (activeBids.length === 0) {
+                panelItems.innerHTML = `<p class="text-slate-400 italic py-1">No active bids pending AM review.</p>`;
+                return;
+            }
+
+            panelItems.innerHTML = activeBids.map(b => `
+                <div class="p-2 bg-slate-800 rounded-lg flex items-center justify-between border border-slate-700">
+                    <div>
+                        <span class="font-bold text-white">${b.sku}</span>
+                        <p class="text-[10px] text-slate-400">Bid ₹${b.bidPrice}/kg (${b.qty}kg)</p>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <button onclick="triggerRebidMode('${b.id}')" class="bg-slate-700 hover:bg-slate-600 text-white font-bold text-[10px] px-2 py-1 rounded">Re-bid</button>
+                        <button onclick="markAsLockedIn('${b.id}')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[10px] px-2 py-1 rounded">Lock In</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.textContent = message;
+            if (isError) {
+                toastIcon.className = "fa-solid fa-circle-xmark text-red-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            }
+
+            toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
