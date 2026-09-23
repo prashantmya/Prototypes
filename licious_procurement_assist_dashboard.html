@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Licious Procurement Assist Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        licious: {
+                            emerald: '#004D34',
+                            emeraldDark: '#003624',
+                            mint: '#E8F5E9',
+                            mintLight: '#F2FAF3',
+                            red: '#E23744',
+                            redLight: '#FDF2F2',
+                            gold: '#D97706',
+                            platinum: '#475569',
+                            silver: '#64748B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Mobile Frame & Scrollbars */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .active-tab-btn {
+            color: #004D34;
+            font-weight: 700;
+        }
+        .active-tab-indicator {
+            background-color: #004D34;
+        }
+        /* Mobile Touch Ripple & Active effect */
+        .touch-active:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 md:p-4 text-slate-800">
+
+    <!-- Mobile Outer Container / Viewport Frame -->
+    <div class="w-full max-w-md h-screen md:h-[880px] bg-slate-100 md:rounded-[40px] shadow-2xl flex flex-col overflow-hidden relative border-0 md:border-[8px] md:border-slate-800">
+        
+        <!-- Mobile Native Top Status Bar -->
+        <div class="bg-[#004D34] text-white px-5 pt-3 pb-1 flex justify-between items-center text-xs font-semibold z-30 select-none">
+            <span>09:41</span>
+            <div class="w-20 h-4 bg-slate-900 rounded-full mx-auto hidden md:block"></div>
+            <div class="flex items-center space-x-1.5 text-xs">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full text-sm"></i>
+            </div>
+        </div>
+
+        <!-- App Header Bar -->
+        <header class="bg-[#004D34] text-white px-4 py-3 shadow-md z-20 flex justify-between items-center shrink-0">
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-white p-1.5 rounded-lg flex items-center justify-center w-8 h-8">
+                    <i class="fas fa-[#004D34] fa-fish text-[#004D34] text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base leading-tight tracking-tight">Licious Assist</h1>
+                    <p class="text-[10px] text-emerald-200 font-medium">Seawater Fish Procurement</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-[10px] bg-emerald-800/80 px-2 py-1 rounded-full text-emerald-100 font-medium border border-emerald-600/40">
+                    <i class="far fa-calendar-alt mr-1"></i>Today
+                </span>
+                <button onclick="showToast('Notification queue up-to-date')" class="w-8 h-8 rounded-full bg-emerald-800/60 flex items-center justify-center text-emerald-100 hover:bg-emerald-700 transition">
+                    <i class="far fa-bell text-xs"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content View Area (Scrollable) -->
+        <main id="main-content" class="flex-1 overflow-y-auto no-scrollbar bg-slate-50 relative pb-24">
+            
+            <!-- SECTION 1: AM Performance Dashboard -->
+            <section id="tab-am-perf" class="p-4 space-y-4">
+                <!-- Timeframe Pills -->
+                <div class="bg-white p-1 rounded-xl shadow-sm border border-slate-200 flex text-xs font-semibold">
+                    <button onclick="setTimeframe('day', this)" class="tf-btn flex-1 py-1.5 rounded-lg text-center bg-[#004D34] text-white shadow-sm transition">Day</button>
+                    <button onclick="setTimeframe('week', this)" class="tf-btn flex-1 py-1.5 rounded-lg text-center text-slate-600 hover:text-slate-900 transition">Week</button>
+                    <button onclick="setTimeframe('month', this)" class="tf-btn flex-1 py-1.5 rounded-lg text-center text-slate-600 hover:text-slate-900 transition">Month</button>
+                </div>
+
+                <!-- AM Health Scorecard -->
+                <div class="bg-gradient-to-br from-[#004D34] to-[#003624] text-white rounded-2xl p-4 shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-300">Procurement Index</span>
+                            <h2 class="text-2xl font-black flex items-baseline space-x-2">
+                                <span>94.2</span>
+                                <span class="text-xs font-normal text-emerald-300">/ 100 Health Score</span>
+                            </h2>
+                        </div>
+                        <span class="bg-emerald-400/20 text-emerald-200 text-xs px-2.5 py-1 rounded-full border border-emerald-400/30 font-semibold flex items-center">
+                            <i class="fas fa-arrow-up text-[10px] mr-1"></i>+2.4% vs Target
+                        </span>
+                    </div>
+
+                    <!-- 5 Health Metrics Grid -->
+                    <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-emerald-700/60">
+                        <div class="bg-emerald-900/40 p-2 rounded-lg border border-emerald-700/40">
+                            <span class="text-emerald-200/80 text-[10px] block">1. Price Index</span>
+                            <span class="font-bold text-sm text-white">98.4%</span>
+                            <span class="text-[9px] text-emerald-300 ml-1">(1.6% below ceiling)</span>
+                        </div>
+                        <div class="bg-emerald-900/40 p-2 rounded-lg border border-emerald-700/40">
+                            <span class="text-emerald-200/80 text-[10px] block">2. Fill Rate %</span>
+                            <span class="font-bold text-sm text-white">94.5%</span>
+                            <span class="text-[9px] text-emerald-300 ml-1">(+1.8% vs last wk)</span>
+                        </div>
+                        <div class="bg-emerald-900/40 p-2 rounded-lg border border-emerald-700/40">
+                            <span class="text-emerald-200/80 text-[10px] block">3. Quality %</span>
+                            <span class="font-bold text-sm text-white">96.8%</span>
+                            <span class="text-[9px] text-emerald-300 ml-1">(0.8% rejection)</span>
+                        </div>
+                        <div class="bg-emerald-900/40 p-2 rounded-lg border border-emerald-700/40">
+                            <span class="text-emerald-200/80 text-[10px] block">4. SKU Spread</span>
+                            <span class="font-bold text-sm text-white">8 / 8 Active</span>
+                            <span class="text-[9px] text-emerald-300 ml-1">(100% Coverage)</span>
+                        </div>
+                        <div class="col-span-2 bg-emerald-900/40 p-2 rounded-lg border border-emerald-700/40 flex justify-between items-center">
+                            <div>
+                                <span class="text-emerald-200/80 text-[10px] block">5. Scale (Total Qty Fulfilled)</span>
+                                <span class="font-bold text-sm text-white">4,850 Kg</span>
+                            </div>
+                            <span class="text-[10px] bg-emerald-500/30 text-emerald-100 font-semibold px-2 py-0.5 rounded">97% Target</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geography Grouping -->
+                <div class="space-y-2">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center">
+                        <i class="fas fa-map-marker-alt text-[#004D34] mr-1.5"></i>Geography Breakdown
+                    </h3>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm text-center">
+                            <span class="text-[10px] font-semibold text-slate-500 block">West Coast</span>
+                            <span class="text-xs font-bold text-slate-800">2,400 kg</span>
+                            <span class="text-[9px] text-emerald-600 block font-medium">96% Fill Rate</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm text-center">
+                            <span class="text-[10px] font-semibold text-slate-500 block">East Coast</span>
+                            <span class="text-xs font-bold text-slate-800">1,650 kg</span>
+                            <span class="text-[9px] text-emerald-600 block font-medium">92% Fill Rate</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm text-center">
+                            <span class="text-[10px] font-semibold text-slate-500 block">Deep Sea Ports</span>
+                            <span class="text-xs font-bold text-slate-800">800 kg</span>
+                            <span class="text-[9px] text-emerald-600 block font-medium">91% Fill Rate</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supplier Drilldown Section -->
+                <div class="space-y-2 pt-1">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center">
+                            <i class="fas fa-users-cog text-[#004D34] mr-1.5"></i>Supplier Drill-down
+                        </h3>
+                        <span class="text-[10px] text-slate-400">Tap to inspect metrics</span>
+                    </div>
+
+                    <!-- Supplier Selector List -->
+                    <div class="space-y-2" id="supplier-list-container">
+                        <!-- Bayline Marine -->
+                        <div onclick="selectSupplier('bayline', this)" class="supplier-card bg-white p-3 rounded-xl border-2 border-emerald-600 shadow-sm cursor-pointer transition touch-active">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span class="font-bold text-xs text-slate-800">Bayline Marine Products</span>
+                                </div>
+                                <span class="bg-slate-100 text-slate-700 text-[10px] px-2 py-0.5 rounded font-bold">Platinum</span>
+                            </div>
+                        </div>
+
+                        <!-- SeaFresh Catch -->
+                        <div onclick="selectSupplier('seafresh', this)" class="supplier-card bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer transition touch-active">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                    <span class="font-bold text-xs text-slate-800">SeaFresh Catch Ltd</span>
+                                </div>
+                                <span class="bg-amber-50 text-amber-700 text-[10px] px-2 py-0.5 rounded font-bold border border-amber-200">Gold</span>
+                            </div>
+                        </div>
+
+                        <!-- Ocean Harvest -->
+                        <div onclick="selectSupplier('oceanharvest', this)" class="supplier-card bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer transition touch-active">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                                    <span class="font-bold text-xs text-slate-800">Ocean Harvest Co.</span>
+                                </div>
+                                <span class="bg-amber-50 text-amber-700 text-[10px] px-2 py-0.5 rounded font-bold border border-amber-200">Gold</span>
+                            </div>
+                        </div>
+
+                        <!-- Apex Aqua -->
+                        <div onclick="selectSupplier('apexaqua', this)" class="supplier-card bg-white p-3 rounded-xl border border-slate-200 shadow-sm cursor-pointer transition touch-active">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span>
+                                    <span class="font-bold text-xs text-slate-800">Apex Aqua Logistics</span>
+                                </div>
+                                <span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded font-bold">Silver</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Selected Supplier Detail Card Panel -->
+                    <div id="supplier-detail-panel" class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3.5 space-y-3 mt-3">
+                        <div class="flex justify-between items-center border-b border-emerald-200/80 pb-2">
+                            <div>
+                                <h4 id="sup-detail-name" class="font-extrabold text-xs text-[#004D34]">Bayline Marine Products</h4>
+                                <p id="sup-detail-ports" class="text-[10px] text-slate-600">Primary Ports: Mangalore, Ratnagiri</p>
+                            </div>
+                            <span id="sup-detail-tier" class="bg-[#004D34] text-white text-[10px] px-2 py-0.5 rounded font-bold">Platinum Tier</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="bg-white p-2 rounded-lg border border-emerald-100 shadow-xs">
+                                <span class="text-[10px] text-slate-500 block">Fill Rate %</span>
+                                <span id="sup-detail-fill" class="font-bold text-emerald-800 text-sm">96.5%</span>
+                            </div>
+                            <div class="bg-white p-2 rounded-lg border border-emerald-100 shadow-xs">
+                                <span class="text-[10px] text-slate-500 block">Quality Score</span>
+                                <span id="sup-detail-quality" class="font-bold text-emerald-800 text-sm">98.2 / 100</span>
+                            </div>
+                            <div class="bg-white p-2 rounded-lg border border-emerald-100 shadow-xs">
+                                <span class="text-[10px] text-slate-500 block">Reject %</span>
+                                <span id="sup-detail-reject" class="font-bold text-rose-600 text-sm">0.5%</span>
+                            </div>
+                            <div class="bg-white p-2 rounded-lg border border-emerald-100 shadow-xs">
+                                <span class="text-[10px] text-slate-500 block">On-Time Score</span>
+                                <span id="sup-detail-ontime" class="font-bold text-emerald-800 text-sm">95.0%</span>
+                            </div>
+                        </div>
+                        <div class="bg-white p-2 rounded-lg border border-emerald-100 shadow-xs flex justify-between items-center">
+                            <span class="text-[10px] text-slate-500">Total Fulfilled Vol (This Month)</span>
+                            <span id="sup-detail-vol" class="font-extrabold text-xs text-[#004D34]">1,820 Kg</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: Input on Behalf of Supplier -->
+            <section id="tab-supplier-input" class="p-4 space-y-4 hidden">
+                <!-- Top Action Card: Bulk CSV Availability Upload -->
+                <div class="bg-gradient-to-r from-emerald-800 to-[#004D34] text-white p-3.5 rounded-2xl shadow-md flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-xs">Bulk Availability Upload</h3>
+                        <p class="text-[10px] text-emerald-200">Upload CSV or manual entries for suppliers</p>
+                    </div>
+                    <button onclick="openModal('bulk-upload-modal')" class="bg-white text-[#004D34] text-xs font-bold px-3 py-2 rounded-xl shadow-sm hover:bg-emerald-50 transition touch-active">
+                        <i class="fas fa-file-upload mr-1.5"></i>Upload
+                    </button>
+                </div>
+
+                <!-- 3 Sub-tabs / Status Views -->
+                <div class="bg-white p-1 rounded-xl shadow-sm border border-slate-200 flex text-[11px] font-semibold">
+                    <button onclick="switchSubTab('uploaded', this)" class="subtab-btn flex-1 py-1.5 rounded-lg text-center bg-[#004D34] text-white transition">Uploaded (4)</button>
+                    <button onclick="switchSubTab('pending', this)" class="subtab-btn flex-1 py-1.5 rounded-lg text-center text-slate-600 transition">Pending (3)</button>
+                    <button onclick="switchSubTab('redflagged', this)" class="subtab-btn flex-1 py-1.5 rounded-lg text-center text-slate-600 transition">Red Flagged (2)</button>
+                </div>
+
+                <!-- Sub-tab 1: Uploaded Availability -->
+                <div id="subtab-uploaded" class="space-y-2.5">
+                    <p class="text-[10px] text-slate-500 font-medium">Tap supplier card to view detailed line items</p>
+                    
+                    <!-- Item 1 -->
+                    <div onclick="openLineItemModal('Bayline Marine Products', 'Platinum', '3 SKUs x 5 Grades', '1,450 Kg', [
+                        {sku: 'King Fish (Surmai)', grade: 'Grade A', qty: '500 kg', price: '₹720/kg'},
+                        {sku: 'King Fish (Surmai)', grade: 'Grade B', qty: '350 kg', price: '₹640/kg'},
+                        {sku: 'White Pomfret', grade: 'Grade A', qty: '300 kg', price: '₹910/kg'},
+                        {sku: 'Black Pomfret', grade: 'Grade A', qty: '300 kg', price: '₹580/kg'}
+                    ])" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2 cursor-pointer hover:border-emerald-500 transition touch-active">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="font-bold text-xs text-slate-800">Bayline Marine Products</span>
+                                    <span class="bg-slate-100 text-slate-700 text-[9px] px-1.5 py-0.5 rounded font-extrabold">Platinum</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500">Submitted today at 08:15 AM</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+                        </div>
+                        <div class="flex justify-between items-center text-xs bg-slate-50 p-2 rounded-lg text-slate-700">
+                            <span>Grade x SKU Count: <strong class="text-slate-900">3 SKUs x 5 Grades</strong></span>
+                            <span>Total Qty: <strong class="text-[#004D34]">1,450 Kg</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Item 2 -->
+                    <div onclick="openLineItemModal('SeaFresh Catch Ltd', 'Gold', '2 SKUs x 3 Grades', '850 Kg', [
+                        {sku: 'Indian Salmon (Rawas)', grade: 'Grade A', qty: '400 kg', price: '₹820/kg'},
+                        {sku: 'Seer Fish', grade: 'Grade A', qty: '450 kg', price: '₹690/kg'}
+                    ])" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2 cursor-pointer hover:border-emerald-500 transition touch-active">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="font-bold text-xs text-slate-800">SeaFresh Catch Ltd</span>
+                                    <span class="bg-amber-50 text-amber-700 text-[9px] px-1.5 py-0.5 rounded font-extrabold border border-amber-200">Gold</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500">Submitted today at 08:40 AM</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+                        </div>
+                        <div class="flex justify-between items-center text-xs bg-slate-50 p-2 rounded-lg text-slate-700">
+                            <span>Grade x SKU Count: <strong class="text-slate-900">2 SKUs x 3 Grades</strong></span>
+                            <span>Total Qty: <strong class="text-[#004D34]">850 Kg</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Item 3 -->
+                    <div onclick="openLineItemModal('Ocean Harvest Co.', 'Gold', '3 SKUs x 4 Grades', '920 Kg', [
+                        {sku: 'Red Snapper', grade: 'Grade A', qty: '320 kg', price: '₹510/kg'},
+                        {sku: 'Mackerel (Bangda)', grade: 'Grade A', qty: '600 kg', price: '₹190/kg'}
+                    ])" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2 cursor-pointer hover:border-emerald-500 transition touch-active">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="flex items-center space-x-1.5">
+                                    <span class="font-bold text-xs text-slate-800">Ocean Harvest Co.</span>
+                                    <span class="bg-amber-50 text-amber-700 text-[9px] px-1.5 py-0.5 rounded font-extrabold border border-amber-200">Gold</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500">Submitted today at 09:02 AM</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+                        </div>
+                        <div class="flex justify-between items-center text-xs bg-slate-50 p-2 rounded-lg text-slate-700">
+                            <span>Grade x SKU Count: <strong class="text-slate-900">3 SKUs x 4 Grades</strong></span>
+                            <span>Total Qty: <strong class="text-[#004D34]">920 Kg</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub-tab 2: Pending (SEH System) -->
+                <div id="subtab-pending" class="space-y-2.5 hidden">
+                    <p class="text-[10px] text-slate-500 font-medium">Suppliers who haven't updated availability today</p>
+                    
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-xs text-slate-800">Coastal Fisheries Hub</h4>
+                            <span class="text-[10px] text-slate-500">Last seen: Yesterday 05:30 PM</span>
+                        </div>
+                        <button onclick="nudgeSupplier('Coastal Fisheries Hub')" class="bg-emerald-50 text-[#004D34] hover:bg-[#004D34] hover:text-white border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-lg transition touch-active">
+                            <i class="fab fa-whatsapp mr-1 text-emerald-600"></i>Nudge
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-xs text-slate-800">Deep Blue Supplies</h4>
+                            <span class="text-[10px] text-slate-500">Last seen: 2 days ago</span>
+                        </div>
+                        <button onclick="nudgeSupplier('Deep Blue Supplies')" class="bg-emerald-50 text-[#004D34] hover:bg-[#004D34] hover:text-white border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-lg transition touch-active">
+                            <i class="fab fa-whatsapp mr-1 text-emerald-600"></i>Nudge
+                        </button>
+                    </div>
+
+                    <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-xs text-slate-800">Malabar Catch Enterprise</h4>
+                            <span class="text-[10px] text-slate-500">Last seen: Yesterday 08:10 PM</span>
+                        </div>
+                        <button onclick="nudgeSupplier('Malabar Catch Enterprise')" class="bg-emerald-50 text-[#004D34] hover:bg-[#004D34] hover:text-white border border-emerald-200 text-xs font-bold px-3 py-1.5 rounded-lg transition touch-active">
+                            <i class="fab fa-whatsapp mr-1 text-emerald-600"></i>Nudge
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sub-tab 3: Red Flagged Section -->
+                <div id="subtab-redflagged" class="space-y-3 hidden">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] text-rose-600 font-bold uppercase tracking-wider">0 Orders Allocation Priority</span>
+                        <button onclick="openModal('add-redlist-modal')" class="bg-rose-600 text-white text-xs font-bold px-2.5 py-1.5 rounded-lg shadow-xs hover:bg-rose-700 transition touch-active">
+                            <i class="fas fa-plus mr-1"></i>Add Supplier
+                        </button>
+                    </div>
+
+                    <div id="red-suppliers-container" class="space-y-2.5">
+                        <!-- Red Supplier Item 1 -->
+                        <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl shadow-xs space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-xs text-rose-900">Coastal Reef Exports</h4>
+                                    <p class="text-[10px] text-rose-700">Flagged: High Quality Rejection Rate (&gt;8%)</p>
+                                </div>
+                                <span class="bg-rose-600 text-white text-[9px] px-2 py-0.5 rounded font-extrabold">Red Flagged</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1 border-t border-rose-200/60 text-xs">
+                                <span class="text-[10px] text-rose-800">Assigned Orders: <strong>0 Kg</strong></span>
+                                <button onclick="removeRedFlag(this, 'Coastal Reef Exports')" class="text-xs text-rose-700 underline font-semibold hover:text-rose-900">Remove Flag</button>
+                            </div>
+                        </div>
+
+                        <!-- Red Supplier Item 2 -->
+                        <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl shadow-xs space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-xs text-rose-900">Veraval Ocean Traders</h4>
+                                    <p class="text-[10px] text-rose-700">Flagged: Compliance &amp; Temperature Breach</p>
+                                </div>
+                                <span class="bg-rose-600 text-white text-[9px] px-2 py-0.5 rounded font-extrabold">Red Flagged</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-1 border-t border-rose-200/60 text-xs">
+                                <span class="text-[10px] text-rose-800">Assigned Orders: <strong>0 Kg</strong></span>
+                                <button onclick="removeRedFlag(this, 'Veraval Ocean Traders')" class="text-xs text-rose-700 underline font-semibold hover:text-rose-900">Remove Flag</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: Day-to-Day Operations -->
+            <section id="tab-ops-queue" class="p-4 space-y-4 hidden">
+                <!-- Operational Banner (NOTE: Run Allocation Now button is removed completely as requested) -->
+                <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                            <h2 class="font-extrabold text-xs text-slate-800 uppercase tracking-wide">Unallocated Demand Queue</h2>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-0.5">12 SKUs require immediate allocation input</p>
+                    </div>
+                    <button onclick="openModal('see-all-unallocated-modal')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-200 transition touch-active">
+                        See All
+                    </button>
+                </div>
+
+                <!-- 4 Unallocated Operational Categories -->
+                <div class="space-y-3">
+                    
+                    <!-- Category 1: No Availability -->
+                    <div class="bg-white p-3.5 rounded-xl border-l-4 border-l-amber-500 border-y border-r border-slate-200 shadow-sm space-y-2">
+                        <div class="flex justify-between items-start">
+                            <span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-2 py-0.5 rounded uppercase">1. No Availability</span>
+                            <span class="text-xs font-extrabold text-slate-800">350 Kg Pending</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs text-slate-900">King Fish (Surmai) — Grade A</h3>
+                            <p class="text-[10px] text-slate-500">Zero vendor availability uploaded for this grade today.</p>
+                        </div>
+                        <button onclick="openParetoModal('King Fish (Surmai) - Grade A')" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold py-2 rounded-lg transition text-center touch-active">
+                            <i class="fas fa-chart-pie mr-1.5"></i>View Suggested Suppliers (Pareto)
+                        </button>
+                    </div>
+
+                    <!-- Category 2: Price Ceiling Hit -->
+                    <div class="bg-white p-3.5 rounded-xl border-l-4 border-l-rose-500 border-y border-r border-slate-200 shadow-sm space-y-2">
+                        <div class="flex justify-between items-start">
+                            <span class="bg-rose-100 text-rose-800 text-[9px] font-bold px-2 py-0.5 rounded uppercase">2. Price Ceiling Hit</span>
+                            <span class="text-xs font-extrabold text-rose-600">+8.5% Over Ceiling</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs text-slate-900">White Pomfret — Grade A</h3>
+                            <p class="text-[10px] text-slate-500">Quoted Price: ₹980/kg (Max Ceiling Allowed: ₹903/kg)</p>
+                        </div>
+                        <button onclick="triggerApprovalModal('White Pomfret Grade A', 'Quoted ₹980/kg (+8.5% over ceiling)')" class="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold py-2 rounded-lg shadow-xs transition text-center touch-active">
+                            <i class="fas fa-paper-plane mr-1.5"></i>Trigger Approval
+                        </button>
+                    </div>
+
+                    <!-- Category 3: No Market Price Found -->
+                    <div class="bg-white p-3.5 rounded-xl border-l-4 border-l-blue-500 border-y border-r border-slate-200 shadow-sm space-y-2">
+                        <div class="flex justify-between items-start">
+                            <span class="bg-blue-100 text-blue-800 text-[9px] font-bold px-2 py-0.5 rounded uppercase">3. No Market Price Found</span>
+                            <span class="text-xs font-extrabold text-slate-800">200 Kg Demand</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs text-slate-900">Indian Salmon (Rawas) — Grade B</h3>
+                            <p class="text-[10px] text-slate-500">No daily market benchmark index published for today yet.</p>
+                        </div>
+                        <button onclick="triggerApprovalModal('Indian Salmon Grade B', 'Missing Benchmark Market Index')" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2 rounded-lg shadow-xs transition text-center touch-active">
+                            <i class="fas fa-paper-plane mr-1.5"></i>Trigger Approval
+                        </button>
+                    </div>
+
+                    <!-- Category 4: Reserved for Guarantee Vendor -->
+                    <div class="bg-white p-3.5 rounded-xl border-l-4 border-l-emerald-600 border-y border-r border-slate-200 shadow-sm space-y-2">
+                        <div class="flex justify-between items-start">
+                            <span class="bg-emerald-100 text-[#004D34] text-[9px] font-bold px-2 py-0.5 rounded uppercase">4. Reserved for Guarantee Vendor</span>
+                            <span class="text-xs font-extrabold text-emerald-700">Contract Lock</span>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-xs text-slate-900">Yellowfin Tuna — Grade A</h3>
+                            <p class="text-[10px] text-slate-500">400 kg allocated under contracted volume commitment.</p>
+                        </div>
+                        <button onclick="openFastAllocateModal('Yellowfin Tuna - Grade A')" class="w-full bg-[#004D34] hover:bg-[#003624] text-white text-xs font-bold py-2 rounded-lg shadow-xs transition text-center touch-active">
+                            <i class="fas fa-bolt mr-1.5"></i>Fast Allocate
+                        </button>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SECTION 4: Market Price & Ceiling Management -->
+            <section id="tab-prices-ceilings" class="p-4 space-y-4 hidden">
+                <!-- Section Header Tools -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-bold text-xs text-slate-800 uppercase tracking-wide">Market Benchmark &amp; Ceilings</h2>
+                        <button onclick="openModal('ceiling-info-modal')" class="text-emerald-700 hover:text-emerald-900 text-xs flex items-center font-bold">
+                            <i class="fas fa-info-circle mr-1"></i>Ceiling Logic <span class="ml-1 underline">(i)</span>
+                        </button>
+                    </div>
+
+                    <!-- Quick Action Buttons -->
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="loadYesterdayPrices()" class="bg-white hover:bg-emerald-50 text-[#004D34] border border-emerald-300 font-bold text-xs py-2 px-2.5 rounded-xl shadow-xs transition text-center touch-active flex items-center justify-center">
+                            <i class="fas fa-history mr-1.5"></i>Load Yesterday's Prices
+                        </button>
+                        <button onclick="openModal('bulk-price-modal')" class="bg-[#004D34] text-white font-bold text-xs py-2 px-2.5 rounded-xl shadow-xs hover:bg-[#003624] transition text-center touch-active flex items-center justify-center">
+                            <i class="fas fa-file-csv mr-1.5"></i>Bulk CSV Upload
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Market Price Entry Tool (Per SKU x Grade) -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-3.5 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                        <h3 class="font-bold text-xs text-slate-900">Today's Benchmark Price Entry</h3>
+                        <span class="text-[10px] text-slate-400">All prices in ₹ / Kg</span>
+                    </div>
+
+                    <!-- Seawater Fish SKU Inputs -->
+                    <div class="space-y-3 text-xs">
+                        
+                        <!-- SKU 1: King Fish (Surmai) -->
+                        <div class="p-2.5 bg-slate-50 rounded-xl space-y-2">
+                            <div class="flex justify-between font-bold text-slate-800">
+                                <span>1. King Fish (Surmai)</span>
+                                <span class="text-[10px] text-emerald-700 font-normal">Base Grade A Benchmark</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade A</label>
+                                    <input type="number" id="price-surmai-a" value="700" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade B</label>
+                                    <input type="number" id="price-surmai-b" value="620" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade C</label>
+                                    <input type="number" id="price-surmai-c" value="530" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SKU 2: Black Pomfret -->
+                        <div class="p-2.5 bg-slate-50 rounded-xl space-y-2">
+                            <div class="flex justify-between font-bold text-slate-800">
+                                <span>2. Black Pomfret</span>
+                                <span class="text-[10px] text-emerald-700 font-normal">Base Benchmark</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade A</label>
+                                    <input type="number" id="price-bpomfret-a" value="560" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade B</label>
+                                    <input type="number" id="price-bpomfret-b" value="480" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SKU 3: White Pomfret -->
+                        <div class="p-2.5 bg-slate-50 rounded-xl space-y-2">
+                            <div class="flex justify-between font-bold text-slate-800">
+                                <span>3. White Pomfret</span>
+                                <span class="text-[10px] text-emerald-700 font-normal">Base Benchmark</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade A</label>
+                                    <input type="number" id="price-wpomfret-a" value="900" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade B</label>
+                                    <input type="number" id="price-wpomfret-b" value="790" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SKU 4: Indian Salmon (Rawas) -->
+                        <div class="p-2.5 bg-slate-50 rounded-xl space-y-2">
+                            <div class="flex justify-between font-bold text-slate-800">
+                                <span>4. Indian Salmon (Rawas)</span>
+                                <span class="text-[10px] text-emerald-700 font-normal">Base Benchmark</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade A</label>
+                                    <input type="number" id="price-rawas-a" value="810" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-[9px] text-slate-500 font-semibold block">Grade B</label>
+                                    <input type="number" id="price-rawas-b" value="720" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:border-emerald-600 focus:outline-none">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Remaining SKUs Collapsible Toggle -->
+                        <div id="more-skus-container" class="hidden space-y-3 pt-1">
+                            <!-- SKU 5: Red Snapper -->
+                            <div class="p-2.5 bg-slate-50 rounded-xl space-y-2">
+                                <span class="font-bold text-slate-800 block">5. Red Snapper</span>
+                                <input type="number" value="490" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+                            </div>
+                            <!-- SKU 6: Yellowfin Tuna -->
+                            <div class="p-2.5 bg-slate-50 rounded-xl space-y-2">
+                                <span class="font-bold text-slate-800 block">6. Yellowfin Tuna</span>
+                                <input type="number" value="430" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+                            </div>
+                            <!-- SKU 7: Seer Fish -->
+                            <div class="p-2.5 bg-slate-50 rounded-xl space-y-2">
+                                <span class="font-bold text-slate-800 block">7. Seer Fish</span>
+                                <input type="number" value="670" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+                            </div>
+                            <!-- SKU 8: Mackerel (Bangda) -->
+                            <div class="p-2.5 bg-slate-50 rounded-xl space-y-2">
+                                <span class="font-bold text-slate-800 block">8. Mackerel (Bangda)</span>
+                                <input type="number" value="185" class="price-input w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800">
+                            </div>
+                        </div>
+
+                        <button onclick="toggleMoreSKUs(this)" class="w-full text-center text-[11px] font-bold text-[#004D34] py-1">
+                            <i class="fas fa-chevron-down mr-1"></i>Show All 8 Seawater SKUs
+                        </button>
+                    </div>
+
+                    <button onclick="showToast('Market Benchmark Prices Saved Successfully!')" class="w-full bg-[#004D34] hover:bg-[#003624] text-white text-xs font-bold py-2.5 rounded-xl shadow-xs transition touch-active">
+                        Save Updated Market Prices
+                    </button>
+                </div>
+
+                <!-- SKU LEVEL Tier Ceiling Manager -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-3.5 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                        <div>
+                            <h3 class="font-bold text-xs text-slate-900">Tier Ceiling Manager</h3>
+                            <p class="text-[10px] text-slate-500">SKU-level maximum allowed price thresholds</p>
+                        </div>
+                        <span class="bg-emerald-50 text-[#004D34] text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-200">SKU Configurable</span>
+                    </div>
+
+                    <!-- Select SKU for ceiling config -->
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-600 block mb-1">Select SKU to Configure Ceiling</label>
+                        <select id="ceiling-sku-select" onchange="updateCeilingFields()" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none">
+                            <option value="surmai">King Fish (Surmai)</option>
+                            <option value="wpomfret">White Pomfret</option>
+                            <option value="bpomfret">Black Pomfret</option>
+                            <option value="rawas">Indian Salmon (Rawas)</option>
+                            <option value="redsnapper">Red Snapper</option>
+                            <option value="tuna">Yellowfin Tuna</option>
+                            <option value="seer">Seer Fish</option>
+                            <option value="mackerel">Mackerel (Bangda)</option>
+                        </select>
+                    </div>
+
+                    <!-- Ceiling Allowances Input Form -->
+                    <div class="space-y-2 bg-slate-50 p-3 rounded-xl">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold text-slate-700 flex items-center">
+                                <i class="fas fa-award text-slate-700 mr-1.5"></i>Platinum Tier Allowance %
+                            </label>
+                            <div class="flex items-center space-x-1">
+                                <input type="number" id="ceil-plat" value="5.0" step="0.5" class="w-16 p-1 bg-white border border-slate-300 rounded text-right font-bold text-xs">
+                                <span class="text-xs font-bold text-slate-600">%</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold text-slate-700 flex items-center">
+                                <i class="fas fa-award text-amber-600 mr-1.5"></i>Gold Tier Allowance %
+                            </label>
+                            <div class="flex items-center space-x-1">
+                                <input type="number" id="ceil-gold" value="3.0" step="0.5" class="w-16 p-1 bg-white border border-slate-300 rounded text-right font-bold text-xs">
+                                <span class="text-xs font-bold text-slate-600">%</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-bold text-slate-700 flex items-center">
+                                <i class="fas fa-award text-slate-400 mr-1.5"></i>Silver Tier Allowance %
+                            </label>
+                            <div class="flex items-center space-x-1">
+                                <input type="number" id="ceil-silver" value="0.0" step="0.5" class="w-16 p-1 bg-white border border-slate-300 rounded text-right font-bold text-xs">
+                                <span class="text-xs font-bold text-slate-600">%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-2.5 bg-emerald-50 rounded-xl text-[10px] text-emerald-900 font-medium border border-emerald-200">
+                        <i class="fas fa-calculator mr-1 text-[#004D34]"></i>
+                        <span>Effective Max Ceiling for Platinum: <strong id="effective-ceil-calc">₹735 / Kg</strong></span>
+                    </div>
+
+                    <button onclick="saveCeilingConfig()" class="w-full bg-[#004D34] hover:bg-[#003624] text-white text-xs font-bold py-2.5 rounded-xl shadow-xs transition touch-active">
+                        Update &amp; Retain Ceiling Thresholds
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FIXED MOBILE BOTTOM TAB NAVIGATION BAR (Requirement 1) -->
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-slate-200 shadow-2xl z-30 flex justify-around items-center px-1 py-2 select-none md:rounded-b-[32px]">
+            <!-- Tab 1: AM Perf -->
+            <button onclick="switchTab('am-perf', this)" class="tab-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-xs active-tab-btn transition touch-active">
+                <i class="fas fa-chart-line text-lg mb-0.5"></i>
+                <span class="text-[10px] tracking-tight">AM Perf</span>
+            </button>
+
+            <!-- Tab 2: Supplier Input -->
+            <button onclick="switchTab('supplier-input', this)" class="tab-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-xs text-slate-400 hover:text-slate-600 transition touch-active">
+                <i class="fas fa-[#004D34] fa-truck-loading text-lg mb-0.5"></i>
+                <span class="text-[10px] tracking-tight">Supplier Input</span>
+            </button>
+
+            <!-- Tab 3: Ops Queue -->
+            <button onclick="switchTab('ops-queue', this)" class="tab-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-xs text-slate-400 hover:text-slate-600 transition touch-active relative">
+                <span class="absolute top-0 right-4 w-2 h-2 rounded-full bg-amber-500"></span>
+                <i class="fas fa-tasks text-lg mb-0.5"></i>
+                <span class="text-[10px] tracking-tight">Ops Queue</span>
+            </button>
+
+            <!-- Tab 4: Prices & Ceilings -->
+            <button onclick="switchTab('prices-ceilings', this)" class="tab-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-xs text-slate-400 hover:text-slate-600 transition touch-active">
+                <i class="fas fa-tags text-lg mb-0.5"></i>
+                <span class="text-[10px] tracking-tight">Prices &amp; Ceilings</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- MODALS CONTAINER -->
+
+    <!-- Modal 1: Bulk CSV Availability Upload Modal -->
+    <div id="bulk-upload-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3 relative animate-in fade-in zoom-in duration-150">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-slate-900">Bulk Availability Upload</h3>
+                <button onclick="closeModal('bulk-upload-modal')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-base"></i></button>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Target Supplier</label>
+                    <select id="bulk-supplier-select" class="w-full p-2 bg-slate-50 border border-slate-300 rounded-xl font-medium">
+                        <option>Bayline Marine Products (Platinum)</option>
+                        <option>SeaFresh Catch Ltd (Gold)</option>
+                        <option>Ocean Harvest Co. (Gold)</option>
+                        <option>Apex Aqua Logistics (Silver)</option>
+                    </select>
+                </div>
+
+                <!-- Drag & Drop Zone -->
+                <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/50 rounded-xl p-4 text-center cursor-pointer hover:bg-emerald-50 transition">
+                    <i class="fas fa-cloud-upload-alt text-2xl text-[#004D34] mb-1 block"></i>
+                    <span class="font-bold text-slate-700 block">Choose CSV File</span>
+                    <span class="text-[10px] text-slate-400">or enter SKU x Grade x Qty manually</span>
+                </div>
+
+                <!-- Manual Entry Quick Form -->
+                <div class="space-y-2 border-t pt-2">
+                    <span class="font-bold text-[11px] text-slate-800 block">Quick Manual Add</span>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <select class="p-1.5 bg-slate-50 border rounded text-[10px] font-medium">
+                            <option>King Fish (Surmai)</option>
+                            <option>White Pomfret</option>
+                            <option>Indian Salmon</option>
+                        </select>
+                        <select class="p-1.5 bg-slate-50 border rounded text-[10px] font-medium">
+                            <option>Grade A</option>
+                            <option>Grade B</option>
+                            <option>Grade C</option>
+                        </select>
+                        <input type="number" placeholder="Qty (Kg)" class="p-1.5 bg-slate-50 border rounded text-[10px] font-bold">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeModal('bulk-upload-modal'); showToast('Availability Upload Processed Successfully!')" class="w-full bg-[#004D34] text-white font-bold py-2.5 rounded-xl text-xs hover:bg-[#003624]">
+                Confirm &amp; Submit Availability
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal 2: Pareto Supplier Suggestions Modal -->
+    <div id="pareto-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <div>
+                    <h3 class="font-bold text-sm text-slate-900">Suggested Suppliers (Pareto)</h3>
+                    <p id="pareto-sku-name" class="text-[10px] text-emerald-700 font-bold">King Fish (Surmai) - Grade A</p>
+                </div>
+                <button onclick="closeModal('pareto-modal')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-base"></i></button>
+            </div>
+
+            <p class="text-[10px] text-slate-500">Based on historical 90-day fulfillment volume percentage:</p>
+
+            <div class="space-y-2 text-xs">
+                <!-- Supplier 1 -->
+                <div class="bg-slate-50 p-2.5 rounded-xl space-y-1.5 border">
+                    <div class="flex justify-between font-bold">
+                        <span>Bayline Marine Products</span>
+                        <span class="text-[#004D34]">45% Share</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div class="bg-[#004D34] h-full" style="width: 45%"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-500 pt-0.5">
+                        <span>Avg Price: ₹710/kg</span>
+                        <button onclick="closeModal('pareto-modal'); showToast('Demand Assigned to Bayline Marine!')" class="bg-[#004D34] text-white font-bold px-2 py-0.5 rounded">Assign</button>
+                    </div>
+                </div>
+
+                <!-- Supplier 2 -->
+                <div class="bg-slate-50 p-2.5 rounded-xl space-y-1.5 border">
+                    <div class="flex justify-between font-bold">
+                        <span>SeaFresh Catch Ltd</span>
+                        <span class="text-amber-600">30% Share</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div class="bg-amber-500 h-full" style="width: 30%"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] text-slate-500 pt-0.5">
+                        <span>Avg Price: ₹725/kg</span>
+                        <button onclick="closeModal('pareto-modal'); showToast('Demand Assigned to SeaFresh Catch!')" class="bg-[#004D34] text-white font-bold px-2 py-0.5 rounded">Assign</button>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeModal('pareto-modal')" class="w-full bg-slate-100 text-slate-700 font-bold py-2 rounded-xl text-xs">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal 3: Fast Allocate Modal -->
+    <div id="fast-allocate-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <div>
+                    <h3 class="font-bold text-sm text-slate-900">Fast Allocate Guarantee</h3>
+                    <p id="fast-sku-name" class="text-[10px] text-emerald-700 font-bold">Yellowfin Tuna - Grade A</p>
+                </div>
+                <button onclick="closeModal('fast-allocate-modal')" class="text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+
+            <p class="text-[10px] text-slate-500">Matching vendors with submitted availability for this SKU x Grade:</p>
+
+            <div class="space-y-2 text-xs">
+                <div class="p-2.5 bg-emerald-50 rounded-xl border border-emerald-200 flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-800 block">Apex Aqua Logistics</span>
+                        <span class="text-[10px] text-emerald-700">Contract Guarantee Lock</span>
+                    </div>
+                    <button onclick="closeModal('fast-allocate-modal'); showToast('Fast Allocated to Apex Aqua!')" class="bg-[#004D34] text-white font-bold text-xs px-3 py-1 rounded-lg">
+                        Select
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 4: Line Items Detail Modal -->
+    <div id="line-item-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <div>
+                    <h3 id="line-modal-supplier" class="font-bold text-sm text-slate-900">Supplier Items</h3>
+                    <span id="line-modal-tier" class="text-[10px] bg-emerald-100 text-[#004D34] font-bold px-1.5 py-0.5 rounded">Platinum</span>
+                </div>
+                <button onclick="closeModal('line-item-modal')" class="text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="space-y-2 text-xs max-h-60 overflow-y-auto no-scrollbar" id="line-items-body">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <button onclick="closeModal('line-item-modal')" class="w-full bg-[#004D34] text-white font-bold py-2 rounded-xl text-xs">
+                Close Line Items
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal 5: Add Supplier to Red List Modal -->
+    <div id="add-redlist-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-rose-600">Add Supplier to Red List</h3>
+                <button onclick="closeModal('add-redlist-modal')" class="text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Select Supplier</label>
+                    <input type="text" id="red-sup-name-input" placeholder="Enter supplier name" class="w-full p-2 bg-slate-50 border rounded-xl font-medium">
+                </div>
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Reason for Flagging</label>
+                    <select id="red-sup-reason-input" class="w-full p-2 bg-slate-50 border rounded-xl font-medium">
+                        <option>High Quality Rejection Rate (&gt;8%)</option>
+                        <option>Repeated Late Delivery Breach</option>
+                        <option>Cold Chain / Temperature Failure</option>
+                        <option>Non-compliance with Licious Standards</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="addSupplierToRedList()" class="w-full bg-rose-600 text-white font-bold py-2.5 rounded-xl text-xs hover:bg-rose-700">
+                Confirm &amp; Set to 0 Orders
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal 6: Ceiling Logic Info Modal (i) -->
+    <div id="ceiling-info-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-[#004D34]"><i class="fas fa-info-circle mr-1"></i>Ceiling Calculation Formula</h3>
+                <button onclick="closeModal('ceiling-info-modal')" class="text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200 text-xs text-slate-700 space-y-2">
+                <p class="font-bold text-[#004D34]">Max Allowed Quoted Price Logic:</p>
+                <div class="bg-white p-2 rounded border font-mono text-[11px] text-slate-800">
+                    Baseline Benchmark + (Baseline * Tier Allowance %) = Max Allowed Price
+                </div>
+                <p class="text-[10px] text-slate-600">
+                    Example: Surmai Grade A Baseline ₹700 + Platinum Allowance (5%) = <strong>₹735 / Kg Max Allowed</strong>.
+                </p>
+            </div>
+
+            <button onclick="closeModal('ceiling-info-modal')" class="w-full bg-[#004D34] text-white font-bold py-2 rounded-xl text-xs">
+                Understood
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal 7: Trigger Approval Modal -->
+    <div id="trigger-approval-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-slate-900">Trigger Manager Approval</h3>
+                <button onclick="closeModal('trigger-approval-modal')" class="text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <div class="p-2.5 bg-slate-50 rounded-xl space-y-1">
+                    <span id="appr-sku-title" class="font-bold text-slate-800 block">White Pomfret Grade A</span>
+                    <span id="appr-reason-desc" class="text-[10px] text-rose-600 block">Quoted +8.5% over ceiling</span>
+                </div>
+
+                <div>
+                    <label class="font-bold text-slate-700 block mb-1">Escalation Note</label>
+                    <textarea placeholder="Reason for price breach or missing market index request..." class="w-full p-2 bg-slate-50 border rounded-xl text-xs h-20"></textarea>
+                </div>
+            </div>
+
+            <button onclick="closeModal('trigger-approval-modal'); showToast('Approval Request Escalated to AM Lead!')" class="w-full bg-[#004D34] text-white font-bold py-2.5 rounded-xl text-xs hover:bg-[#003624]">
+                Send Escalation
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal 8: See All Unallocated Queue Modal -->
+    <div id="see-all-unallocated-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 class="font-bold text-sm text-slate-900">All Unallocated Items (12)</h3>
+                <button onclick="closeModal('see-all-unallocated-modal')" class="text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="space-y-2 text-xs max-h-72 overflow-y-auto no-scrollbar">
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between"><span>King Fish (Surmai) Grade A</span><span class="font-bold text-amber-600">No Avail</span></div>
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between"><span>White Pomfret Grade A</span><span class="font-bold text-rose-600">Ceiling Hit</span></div>
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between"><span>Indian Salmon Grade B</span><span class="font-bold text-blue-600">No Price</span></div>
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between"><span>Yellowfin Tuna Grade A</span><span class="font-bold text-emerald-600">Guarantee</span></div>
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between"><span>Red Snapper Grade B</span><span class="font-bold text-amber-600">No Avail</span></div>
+                <div class="p-2 bg-slate-50 rounded-lg flex justify-between"><span>Mackerel (Bangda) Grade A</span><span class="font-bold text-rose-600">Ceiling Hit</span></div>
+            </div>
+
+            <button onclick="closeModal('see-all-unallocated-modal')" class="w-full bg-slate-100 text-slate-700 font-bold py-2 rounded-xl text-xs">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification Banner -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-2xl z-50 flex items-center space-x-2 transition-all duration-200 opacity-0 pointer-events-none transform -translate-y-4">
+        <i class="fas fa-check-circle text-emerald-400"></i>
+        <span id="toast-msg">Action completed</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        
+        // Retained SKU Ceiling Configurations State
+        const ceilingStore = {
+            surmai: { plat: 5.0, gold: 3.0, silver: 0.0, base: 700 },
+            wpomfret: { plat: 4.5, gold: 2.5, silver: 0.0, base: 900 },
+            bpomfret: { plat: 5.0, gold: 3.0, silver: 0.0, base: 560 },
+            rawas: { plat: 4.0, gold: 2.0, silver: 0.0, base: 810 },
+            redsnapper: { plat: 5.0, gold: 3.0, silver: 0.0, base: 490 },
+            tuna: { plat: 5.0, gold: 3.0, silver: 0.0, base: 430 },
+            seer: { plat: 5.0, gold: 3.0, silver: 0.0, base: 670 },
+            mackerel: { plat: 5.0, gold: 3.0, silver: 0.0, base: 185 }
+        };
+
+        // Supplier Details Data for Drilldown
+        const supplierData = {
+            bayline: {
+                name: 'Bayline Marine Products',
+                tier: 'Platinum Tier',
+                ports: 'Primary Ports: Mangalore, Ratnagiri',
+                fill: '96.5%',
+                quality: '98.2 / 100',
+                reject: '0.5%',
+                ontime: '95.0%',
+                vol: '1,820 Kg'
+            },
+            seafresh: {
+                name: 'SeaFresh Catch Ltd',
+                tier: 'Gold Tier',
+                ports: 'Primary Ports: Vizag, Chennai',
+                fill: '92.1%',
+                quality: '95.4 / 100',
+                reject: '1.2%',
+                ontime: '91.5%',
+                vol: '1,240 Kg'
+            },
+            oceanharvest: {
+                name: 'Ocean Harvest Co.',
+                tier: 'Gold Tier',
+                ports: 'Primary Ports: Kochi, Mumbai',
+                fill: '90.8%',
+                quality: '94.1 / 100',
+                reject: '1.6%',
+                ontime: '89.0%',
+                vol: '980 Kg'
+            },
+            apexaqua: {
+                name: 'Apex Aqua Logistics',
+                tier: 'Silver Tier',
+                ports: 'Primary Ports: Veraval, Goa',
+                fill: '87.4%',
+                quality: '91.0 / 100',
+                reject: '2.4%',
+                ontime: '86.5%',
+                vol: '810 Kg'
+            }
+        };
+
+        // Bottom Navigation Tab Switcher Function
+        function switchTab(tabId, el) {
+            // Hide all tab sections
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
+            
+            // Show target section
+            const target = document.getElementById('tab-' + tabId);
+            if(target) target.classList.remove('hidden');
+
+            // Reset tab button styling
+            document.querySelectorAll('.tab-nav-btn').forEach(btn => {
+                btn.classList.remove('active-tab-btn');
+                btn.classList.add('text-slate-400');
+            });
+
+            // Highlight clicked button
+            if(el) {
+                el.classList.add('active-tab-btn');
+                el.classList.remove('text-slate-400');
+            }
+
+            // Scroll main container to top
+            document.getElementById('main-content').scrollTop = 0;
+        }
+
+
+        // Subtab Switcher for Section 2
+        function switchSubTab(subId, el) {
+            document.getElementById('subtab-uploaded').classList.add('hidden');
+            document.getElementById('subtab-pending').classList.add('hidden');
+            document.getElementById('subtab-redflagged').classList.add('hidden');
+
+            document.getElementById('subtab-' + subId).classList.remove('hidden');
+
+            document.querySelectorAll('.subtab-btn').forEach(btn => {
+                btn.classList.remove('bg-[#004D34]', 'text-white');
+                btn.classList.add('text-slate-600');
+            });
+
+            if(el) {
+                el.classList.add('bg-[#004D34]', 'text-white');
+                el.classList.remove('text-slate-600');
+            }
+        }
+
+        // Timeframe selector switcher
+        function setTimeframe(type, el) {
+            document.querySelectorAll('.tf-btn').forEach(btn => {
+                btn.classList.remove('bg-[#004D34]', 'text-white');
+                btn.classList.add('text-slate-600');
+            });
+            el.classList.add('bg-[#004D34]', 'text-white');
+            el.classList.remove('text-slate-600');
+            showToast('Loaded ' + type.toUpperCase() + ' Performance View');
+        }
+
+        // Supplier Drilldown Selection
+        function selectSupplier(id, el) {
+            document.querySelectorAll('.supplier-card').forEach(card => {
+                card.classList.remove('border-2', 'border-emerald-600');
+                card.classList.add('border', 'border-slate-200');
+            });
+            el.classList.remove('border', 'border-slate-200');
+            el.classList.add('border-2', 'border-emerald-600');
+
+            const data = supplierData[id];
+            if(data) {
+                document.getElementById('sup-detail-name').innerText = data.name;
+                document.getElementById('sup-detail-ports').innerText = data.ports;
+                document.getElementById('sup-detail-tier').innerText = data.tier;
+                document.getElementById('sup-detail-fill').innerText = data.fill;
+                document.getElementById('sup-detail-quality').innerText = data.quality;
+                document.getElementById('sup-detail-reject').innerText = data.reject;
+                document.getElementById('sup-detail-ontime').innerText = data.ontime;
+                document.getElementById('sup-detail-vol').innerText = data.vol;
+            }
+        }
+
+
+        // Modal Open / Close Helpers
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Toast Message Notification Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+            }, 2500);
+        }
+
+        // Nudge Supplier Action
+        function nudgeSupplier(name) {
+            showToast('Nudge sent to ' + name + ' via WhatsApp & SMS!');
+        }
+
+        // Line Items Inspector Modal Trigger
+        function openLineItemModal(supplier, tier, summary, totalQty, items) {
+            document.getElementById('line-modal-supplier').innerText = supplier;
+            document.getElementById('line-modal-tier').innerText = tier;
+            
+            const container = document.getElementById('line-items-body');
+            container.innerHTML = items.map(item => `
+                <div class="bg-slate-50 p-2.5 rounded-xl border flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-800 block">${item.sku}</span>
+                        <span class="text-[10px] text-slate-500">${item.grade} • Qty: <strong>${item.qty}</strong></span>
+                    </div>
+                    <span class="font-extrabold text-[#004D34]">${item.price}</span>
+                </div>
+            `).join('');
+
+            openModal('line-item-modal');
+        }
+
+        // Pareto & Fast Allocate Modals
+        function openParetoModal(sku) {
+            document.getElementById('pareto-sku-name').innerText = sku;
+            openModal('pareto-modal');
+        }
+
+        function openFastAllocateModal(sku) {
+            document.getElementById('fast-sku-name').innerText = sku;
+            openModal('fast-allocate-modal');
+        }
+
+        function triggerApprovalModal(sku, reason) {
+            document.getElementById('appr-sku-title').innerText = sku;
+            document.getElementById('appr-reason-desc').innerText = reason;
+            openModal('trigger-approval-modal');
+        }
+
+        // Red List Supplier Functions
+        function addSupplierToRedList() {
+            const name = document.getElementById('red-sup-name-input').value || 'New Supplier';
+            const reason = document.getElementById('red-sup-reason-input').value;
+
+            const container = document.getElementById('red-suppliers-container');
+            const newCard = document.createElement('div');
+            newCard.className = 'bg-rose-50/70 border border-rose-200 p-3 rounded-xl shadow-xs space-y-2';
+            newCard.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-xs text-rose-900">${name}</h4>
+                        <p class="text-[10px] text-rose-700">Flagged: ${reason}</p>
+                    </div>
+                    <span class="bg-rose-600 text-white text-[9px] px-2 py-0.5 rounded font-extrabold">Red Flagged</span>
+                </div>
+                <div class="flex justify-between items-center pt-1 border-t border-rose-200/60 text-xs">
+                    <span class="text-[10px] text-rose-800">Assigned Orders: <strong>0 Kg</strong></span>
+                    <button onclick="removeRedFlag(this, '${name}')" class="text-xs text-rose-700 underline font-semibold hover:text-rose-900">Remove Flag</button>
+                </div>
+            `;
+            container.prepend(newCard);
+            closeModal('add-redlist-modal');
+            showToast(name + ' added to Red List (0 Orders Assigned)');
+        }
+
+        function removeRedFlag(btn, name) {
+            btn.closest('.bg-rose-50\\/70').remove();
+            showToast(name + ' removed from Red List');
+        }
+
+
+        // Load Yesterday's Market Benchmark Prices
+        function loadYesterdayPrices() {
+            document.getElementById('price-surmai-a').value = 685;
+            document.getElementById('price-surmai-b').value = 610;
+            document.getElementById('price-surmai-c').value = 520;
+            document.getElementById('price-wpomfret-a').value = 890;
+            document.getElementById('price-wpomfret-b').value = 780;
+            document.getElementById('price-bpomfret-a').value = 550;
+            document.getElementById('price-rawas-a').value = 800;
+            showToast("Loaded Yesterday's Benchmark Prices!");
+        }
+
+        // Toggle Expand All 8 Seawater SKUs
+        function toggleMoreSKUs(btn) {
+            const container = document.getElementById('more-skus-container');
+            if(container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                btn.innerHTML = '<i class="fas fa-chevron-up mr-1"></i>Collapse Extra SKUs';
+            } else {
+                container.classList.add('hidden');
+                btn.innerHTML = '<i class="fas fa-chevron-down mr-1"></i>Show All 8 Seawater SKUs';
+            }
+        }
+
+        // Ceiling SKU Select Change Handler (Retain Values)
+        function updateCeilingFields() {
+            const key = document.getElementById('ceiling-sku-select').value;
+            const item = ceilingStore[key] || { plat: 5.0, gold: 3.0, silver: 0.0, base: 700 };
+            
+            document.getElementById('ceil-plat').value = item.plat;
+            document.getElementById('ceil-gold').value = item.gold;
+            document.getElementById('ceil-silver').value = item.silver;
+
+            calculateEffectiveCeiling(item.base, item.plat);
+        }
+
+        function calculateEffectiveCeiling(base, platPct) {
+            const effective = Math.round(base + (base * (platPct / 100)));
+            document.getElementById('effective-ceil-calc').innerText = '₹' + effective + ' / Kg';
+        }
+
+        function saveCeilingConfig() {
+            const key = document.getElementById('ceiling-sku-select').value;
+            if(ceilingStore[key]) {
+                ceilingStore[key].plat = parseFloat(document.getElementById('ceil-plat').value);
+                ceilingStore[key].gold = parseFloat(document.getElementById('ceil-gold').value);
+                ceilingStore[key].silver = parseFloat(document.getElementById('ceil-silver').value);
+                
+                calculateEffectiveCeiling(ceilingStore[key].base, ceilingStore[key].plat);
+            }
+            showToast('Ceiling Thresholds Retained & Updated for SKU!');
+        }
+
+        // Initialize default state
+        window.onload = function() {
+            updateCeilingFields();
+        };
+    </script>
+</body>
+</html>
