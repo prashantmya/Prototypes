@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Operations Command Center</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#111827',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'ping-slow': 'ping 2s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
+        }
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .flow-line {
+            position: relative;
+        }
+        .flow-line::after {
+            content: '';
+            position: absolute;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+        .blinking-idle {
+            animation: blink-border 1.2s infinite;
+        }
+        @keyframes blink-border {
+            0%, 100% { border-color: rgba(239, 68, 68, 0.9); box-shadow: 0 0 12px rgba(239, 68, 68, 0.6); }
+            50% { border-color: rgba(239, 68, 68, 0.2); box-shadow: none; }
+        }
+        .node-glow-green { box-shadow: 0 0 15px -3px rgba(34, 197, 94, 0.3); }
+        .node-glow-yellow { box-shadow: 0 0 15px -3px rgba(234, 179, 8, 0.3); }
+        .node-glow-red { box-shadow: 0 0 15px -3px rgba(239, 68, 68, 0.4); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden">
+
+    <!-- Top Command Center Navigation Bar -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 sticky top-0 z-40 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center space-x-4">
+            <div class="p-2.5 bg-gradient-to-tr from-indigo-600 to-blue-500 rounded-xl text-white shadow-lg shadow-indigo-500/20">
+                <i class="fa-solid fa-boxes-packing text-xl"></i>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <h1 class="text-lg font-bold text-white tracking-wide">NexusWMS</h1>
+                    <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Command Center v2.4</span>
+                </div>
+                <p class="text-xs text-slate-400">Live End-to-End Warehousing Flow &amp; Telemetry Simulation</p>
+            </div>
+        </div>
+
+        <!-- Metric Target & Dynamic Quick Controls -->
+        <div class="flex items-center space-x-3 overflow-x-auto pb-1 sm:pb-0">
+            <!-- Alert Telemetry Banner -->
+            <div id="top-alert-banner" class="hidden sm:flex items-center space-x-2 bg-amber-500/10 border border-amber-500/30 text-amber-400 px-3 py-1.5 rounded-lg text-xs font-medium animate-pulse">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span id="top-alert-text">2 Bottlenecks Detected</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <button onclick="openModal('metrics-modal')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center space-x-2">
+                <i class="fa-solid fa-sliders text-indigo-400"></i>
+                <span>Metrics &amp; Priority</span>
+            </button>
+
+            <button onclick="openModal('projection-modal')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center space-x-2">
+                <i class="fa-solid fa-chart-line text-blue-400"></i>
+                <span>5-Day Volume Projections</span>
+            </button>
+
+            <button onclick="openModal('manpower-modal')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 transition flex items-center space-x-2">
+                <i class="fa-solid fa-users text-emerald-400"></i>
+                <span>Manpower Skill &amp; Roster</span>
+            </button>
+
+            <button onclick="triggerAutoBalance()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-lg shadow-indigo-600/30 transition flex items-center space-x-2">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Auto-Reallocate MP</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 max-w-[1700px] mx-auto w-full space-y-6">
+
+        <!-- Top Telemetry Summary Panel -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div class="bg-slate-900/70 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Total Deployed MP</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <span id="stat-total-mp" class="text-2xl font-extrabold text-white">48</span>
+                        <span class="text-xs text-slate-400">/ 52 Planned</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-blue-500/10 text-blue-400 rounded-lg">
+                    <i class="fa-solid fa-user-group text-xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/70 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Idle Personnel</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <span id="stat-idle-mp" class="text-2xl font-extrabold text-red-400">5</span>
+                        <span id="stat-idle-warning" class="text-xs text-red-400 font-semibold">(> 15m)</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-red-500/10 text-red-400 rounded-lg">
+                    <i class="fa-solid fa-user-clock text-xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/70 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Inbound Rec-to-Put TAT</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <span id="stat-tat" class="text-2xl font-extrabold text-emerald-400">3.2</span>
+                        <span class="text-xs text-slate-400">hrs (Target: &lt;4.0h)</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg">
+                    <i class="fa-solid fa-clock text-xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/70 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Outbound Breach Risk</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <span id="stat-breach-pct" class="text-2xl font-extrabold text-amber-400">2.1%</span>
+                        <span class="text-xs text-slate-400">(Limit: 3.0%)</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-amber-500/10 text-amber-400 rounded-lg">
+                    <i class="fa-solid fa-circle-exclamation text-xl"></i>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/70 border border-slate-800 p-4 rounded-xl flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Shift Attendance</p>
+                    <div class="flex items-baseline space-x-2 mt-1">
+                        <span id="stat-attendance" class="text-2xl font-extrabold text-indigo-400">92.3%</span>
+                        <span class="text-xs text-slate-400">48 / 52 Present</span>
+                    </div>
+                </div>
+                <div class="p-3 bg-indigo-500/10 text-indigo-400 rounded-lg">
+                    <i class="fa-solid fa-clipboard-user text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Primary Interactive Flow Diagram Diagram Canvas -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 relative overflow-x-auto min-w-[1250px]">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
+                <div class="flex items-center space-x-3">
+                    <h2 class="text-base font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-sitemap text-indigo-400"></i>
+                        Live Operations Diagram
+                    </h2>
+                    <span class="text-xs text-slate-400">Real-time status: Green (On Track), Yellow (Near Limit), Red (Bottleneck)</span>
+                </div>
+                
+                <!-- Diagram Legend -->
+                <div class="flex items-center space-x-6 text-xs text-slate-300">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                        <span>Block Step (&ge;90% Target)</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                        <span>Block Step (70-89% Target)</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span>Block Step (&lt;70% Target)</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded bg-indigo-900/80 border border-indigo-500/50"></div>
+                        <span>Staging Step</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Sections Container -->
+            <div class="grid grid-cols-12 gap-6 relative">
+
+                <!-- SECTION 1: INBOUND FLOW (Cols 1-3) -->
+                <div class="col-span-3 bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between space-y-4 relative">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-truck-ramp-box"></i> 1. Inbound Operations
+                        </span>
+                        <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Primary Flow</span>
+                    </div>
+
+                    <!-- Step 1: Inbound Received Dock (Staging) -->
+                    <div id="node-inbound-dock" class="cursor-pointer transition hover:scale-[1.02]" onclick="openStagingModal('Inbound Dock Staging', 'inbound-dock')">
+                        <!-- Staging Box Rendered via JS -->
+                    </div>
+
+                    <!-- Arrow Down -->
+                    <div class="flex justify-center text-slate-600"><i class="fa-solid fa-arrow-down text-sm"></i></div>
+
+                    <!-- Step 2: GRN Step (Block) -->
+                    <div id="node-grn" class="cursor-pointer transition hover:scale-[1.02]" onclick="openBlockModal('grn')">
+                        <!-- Block Box Rendered via JS -->
+                    </div>
+
+                    <!-- Arrow Down -->
+                    <div class="flex justify-center text-slate-600"><i class="fa-solid fa-arrow-down text-sm"></i></div>
+
+                    <!-- Step 3: Putaway Staging (Staging Step - Receives SRN Merger too) -->
+                    <div id="node-putaway-staging" class="cursor-pointer transition hover:scale-[1.02] relative" onclick="openStagingModal('Putaway Staging', 'putaway-staging')">
+                        <!-- Merge indicator tag for SRN -->
+                        <div class="absolute -left-3 top-1/2 -translate-y-1/2 text-[10px] bg-purple-900/90 border border-purple-500 text-purple-200 px-1.5 py-0.5 rounded shadow flex items-center gap-1">
+                            <i class="fa-solid fa-code-merge"></i> SRN Merge
+                        </div>
+                        <!-- Staging Box Rendered via JS -->
+                    </div>
+
+                    <!-- Arrow Down -->
+                    <div class="flex justify-center text-slate-600"><i class="fa-solid fa-arrow-down text-sm"></i></div>
+
+                    <!-- Step 4: Putaway Step (Block) -->
+                    <div id="node-putaway" class="cursor-pointer transition hover:scale-[1.02]" onclick="openBlockModal('putaway')">
+                        <!-- Block Box Rendered via JS -->
+                    </div>
+                </div>
+
+                <!-- SECTION 2: CENTRAL INVENTORY MATRIX & AUDIT (Cols 4-8) -->
+                <div class="col-span-5 bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-warehouse"></i> 2. Inventory Core &amp; Audit Engine
+                        </span>
+                        <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Central Hub</span>
+                    </div>
+
+                    <!-- Sub Sections Grid (4 Types) -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Fresh Inventory Sub-section -->
+                        <div class="bg-slate-900 border border-emerald-500/30 p-3 rounded-lg flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-emerald-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-box"></i> Fresh Inventory
+                                </span>
+                                <span class="text-[10px] text-slate-400">Active</span>
+                            </div>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">SKU Count:</span><span id="inv-fresh-skus" class="font-mono font-bold text-slate-200">14,250</span></div>
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">Total Qty:</span><span id="inv-fresh-qty" class="font-mono font-bold text-slate-100">182,400</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Supplier Return Inventory -->
+                        <div class="bg-slate-900 border border-amber-500/30 p-3 rounded-lg flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-amber-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-truck-arrow-right"></i> Supplier Return
+                                </span>
+                                <span class="text-[10px] text-slate-400">Pending</span>
+                            </div>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">SKU Count:</span><span id="inv-sup-skus" class="font-mono font-bold text-slate-200">1,120</span></div>
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">Total Qty:</span><span id="inv-sup-qty" class="font-mono font-bold text-slate-100">8,950</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Disposal Inventory -->
+                        <div class="bg-slate-900 border border-red-500/30 p-3 rounded-lg flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-red-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-trash-can"></i> Disposal
+                                </span>
+                                <span class="text-[10px] text-slate-400">Hold</span>
+                            </div>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">SKU Count:</span><span id="inv-disp-skus" class="font-mono font-bold text-slate-200">430</span></div>
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">Total Qty:</span><span id="inv-disp-qty" class="font-mono font-bold text-slate-100">2,100</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Liquidation Inventory -->
+                        <div class="bg-slate-900 border border-blue-500/30 p-3 rounded-lg flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-semibold text-blue-400 flex items-center gap-1">
+                                    <i class="fa-solid fa-dumpster-fire"></i> Liquidation
+                                </span>
+                                <span class="text-[10px] text-slate-400">Ready</span>
+                            </div>
+                            <div class="mt-2 space-y-1">
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">SKU Count:</span><span id="inv-liq-skus" class="font-mono font-bold text-slate-200">890</span></div>
+                                <div class="flex justify-between text-xs"><span class="text-slate-400">Total Qty:</span><span id="inv-liq-qty" class="font-mono font-bold text-slate-100">6,400</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Audit Cycle Section -->
+                    <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <span class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                                <i class="fa-solid fa-clipboard-check text-indigo-400"></i> Cycle Audit Adherence
+                            </span>
+                            <span class="text-[10px] text-slate-400">Audited / Total Target Bins</span>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <!-- Fast Moving -->
+                            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">
+                                <div class="flex items-center justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                                    <span>Fast Moving</span>
+                                    <span class="text-slate-400 text-[9px]">(7d Cycle)</span>
+                                </div>
+                                <div class="flex items-baseline justify-between mb-1">
+                                    <span id="audit-fast-pct" class="text-sm font-bold text-emerald-400">94.2%</span>
+                                    <span id="audit-fast-bins" class="text-[10px] text-slate-400 font-mono">1,884/2,000</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                    <div id="audit-fast-bar" class="bg-emerald-500 h-1.5 rounded-full" style="width: 94.2%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Slow Moving -->
+                            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">
+                                <div class="flex items-center justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                                    <span>Slow Moving</span>
+                                    <span class="text-slate-400 text-[9px]">(30d Cycle)</span>
+                                </div>
+                                <div class="flex items-baseline justify-between mb-1">
+                                    <span id="audit-slow-pct" class="text-sm font-bold text-amber-400">82.5%</span>
+                                    <span id="audit-slow-bins" class="text-[10px] text-slate-400 font-mono">2,475/3,000</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                    <div id="audit-slow-bar" class="bg-amber-500 h-1.5 rounded-full" style="width: 82.5%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Very Slow Moving -->
+                            <div class="p-2.5 bg-slate-950 rounded-lg border border-slate-800">
+                                <div class="flex items-center justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                                    <span>Very Slow</span>
+                                    <span class="text-slate-400 text-[9px]">(90d Cycle)</span>
+                                </div>
+                                <div class="flex items-baseline justify-between mb-1">
+                                    <span id="audit-vslow-pct" class="text-sm font-bold text-indigo-400">98.0%</span>
+                                    <span id="audit-vslow-bins" class="text-[10px] text-slate-400 font-mono">4,900/5,000</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                    <div id="audit-vslow-bar" class="bg-indigo-500 h-1.5 rounded-full" style="width: 98%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: OUTBOUND FLOW (Cols 9-12) -->
+                <div class="col-span-4 bg-slate-950/60 border border-slate-800/80 rounded-xl p-4 flex flex-col justify-between space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-1.5">
+                            <i class="fa-solid fa-paper-plane"></i> 3. Main Outbound Flow
+                        </span>
+                        <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Fulfillment</span>
+                    </div>
+
+                    <!-- Step 1: Picking (Block Step) -->
+                    <div id="node-picking" class="cursor-pointer transition hover:scale-[1.02]" onclick="openBlockModal('picking')">
+                        <!-- Block Box Rendered via JS -->
+                    </div>
+
+                    <!-- Arrow Down -->
+                    <div class="flex justify-center text-slate-600"><i class="fa-solid fa-arrow-down text-sm"></i></div>
+
+                    <!-- Step 2: Pack Staging (Staging Step) -->
+                    <div id="node-pack-staging" class="cursor-pointer transition hover:scale-[1.02]" onclick="openStagingModal('Pack Staging Buffer', 'pack-staging')">
+                        <!-- Staging Box Rendered via JS -->
+                    </div>
+
+                    <!-- Arrow Down -->
+                    <div class="flex justify-center text-slate-600"><i class="fa-solid fa-arrow-down text-sm"></i></div>
+
+                    <!-- Step 3: Packing (Block Step) -->
+                    <div id="node-packing" class="cursor-pointer transition hover:scale-[1.02]" onclick="openBlockModal('packing')">
+                        <!-- Block Box Rendered via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- SECTION 4: OTHER REVERSE & AUXILIARY FLOWS -->
+            <div class="mt-6 pt-6 border-t border-slate-800/80">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-split-up-and-left"></i> Auxiliary &amp; Reverse Operations Flows
+                    </h3>
+                    <span class="text-[11px] text-slate-400">Merges directly into Inbound or Dispatches externally</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+                    <!-- Flow A: SRN (Sales Return Notice) Flow -->
+                    <div class="bg-slate-950/80 border border-purple-500/20 rounded-xl p-3 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                            <span class="text-xs font-semibold text-purple-300">Sales Return (SRN)</span>
+                            <span class="text-[9px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded">Inbound Merge</span>
+                        </div>
+                        
+                        <!-- SRN Staging Step -->
+                        <div id="node-srn-staging" class="cursor-pointer transition hover:scale-[1.02]" onclick="openStagingModal('SRN Staging Area', 'srn-staging')">
+                            <!-- Staging Box Rendered via JS -->
+                        </div>
+                        <div class="text-[10px] text-slate-400 text-center flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-arrow-turn-down"></i> Merges directly at Putaway Staging
+                        </div>
+                    </div>
+
+                    <!-- Flow B: Supplier Return Flow -->
+                    <div class="bg-slate-950/80 border border-amber-500/20 rounded-xl p-3 space-y-2">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                            <span class="text-xs font-semibold text-amber-300">Supplier Return</span>
+                            <span class="text-[9px] bg-amber-900/40 text-amber-300 px-1.5 py-0.5 rounded">From Inventory</span>
+                        </div>
+                        
+                        <div id="node-sup-pick" class="cursor-pointer transition scale-95" onclick="openBlockModal('sup-pick')"></div>
+                        <div id="node-sup-pack-staging" class="cursor-pointer transition scale-95" onclick="openStagingModal('Sup. Pack Staging', 'sup-pack-staging')"></div>
+                        <div id="node-sup-pack" class="cursor-pointer transition scale-95" onclick="openBlockModal('sup-pack')"></div>
+                        <div id="node-sup-disp-staging" class="cursor-pointer transition scale-95" onclick="openStagingModal('Sup. Dispatch Staging', 'sup-disp-staging')"></div>
+                        <div id="node-sup-disp" class="cursor-pointer transition scale-95" onclick="openBlockModal('sup-disp')"></div>
+                    </div>
+
+                    <!-- Flow C: Disposal Flow -->
+                    <div class="bg-slate-950/80 border border-red-500/20 rounded-xl p-3 space-y-2">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                            <span class="text-xs font-semibold text-red-300">Disposal Process</span>
+                            <span class="text-[9px] bg-red-900/40 text-red-300 px-1.5 py-0.5 rounded">Scrap/Destroy</span>
+                        </div>
+                        
+                        <div id="node-disp-pick" class="cursor-pointer transition scale-95" onclick="openBlockModal('disp-pick')"></div>
+                        <div id="node-disp-pack-staging" class="cursor-pointer transition scale-95" onclick="openStagingModal('Disp. Pack Staging', 'disp-pack-staging')"></div>
+                        <div id="node-disp-pack" class="cursor-pointer transition scale-95" onclick="openBlockModal('disp-pack')"></div>
+                        <div id="node-disp-disp-staging" class="cursor-pointer transition scale-95" onclick="openStagingModal('Disp. Gate Staging', 'disp-disp-staging')"></div>
+                        <div id="node-disp-disp" class="cursor-pointer transition scale-95" onclick="openBlockModal('disp-disp')"></div>
+                    </div>
+
+                    <!-- Flow D: Liquidation Flow -->
+                    <div class="bg-slate-950/80 border border-blue-500/20 rounded-xl p-3 space-y-2">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-1.5">
+                            <span class="text-xs font-semibold text-blue-300">Liquidation Process</span>
+                            <span class="text-[9px] bg-blue-900/40 text-blue-300 px-1.5 py-0.5 rounded">Bulk Sales</span>
+                        </div>
+                        
+                        <div id="node-liq-pick" class="cursor-pointer transition scale-95" onclick="openBlockModal('liq-pick')"></div>
+                        <div id="node-liq-pack-staging" class="cursor-pointer transition scale-95" onclick="openStagingModal('Liq. Pack Staging', 'liq-pack-staging')"></div>
+                        <div id="node-liq-pack" class="cursor-pointer transition scale-95" onclick="openBlockModal('liq-pack')"></div>
+                        <div id="node-liq-disp-staging" class="cursor-pointer transition scale-95" onclick="openStagingModal('Liq. Out Staging', 'liq-disp-staging')"></div>
+                        <div id="node-liq-disp" class="cursor-pointer transition scale-95" onclick="openBlockModal('liq-disp')"></div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODAL 1: BLOCK STEP DRILL-DOWN & MANPOWER CONTROL -->
+    <div id="block-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Header -->
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+                <div class="flex items-center space-x-3">
+                    <div id="modal-block-status-pill" class="w-3.5 h-3.5 rounded-full bg-emerald-500"></div>
+                    <div>
+                        <h3 id="modal-block-title" class="text-lg font-bold text-white">GRN Block Step Drill-down</h3>
+                        <p id="modal-block-subtitle" class="text-xs text-slate-400">Process Telemetry &amp; Personnel Productivity Controls</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('block-modal')" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800/50">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-6 space-y-6 overflow-y-auto flex-1">
+                <!-- Controls Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 block mb-1">MP Deployed</label>
+                        <div class="flex items-center space-x-2">
+                            <span id="modal-mp-count" class="text-xl font-bold text-white">8</span>
+                            <span class="text-xs text-slate-500">Personnel</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 block mb-1">Planned Throughput (units/hr)</label>
+                        <div class="flex items-center space-x-3">
+                            <input type="range" id="modal-throughput-slider" min="100" max="3000" step="50" class="w-full accent-indigo-500" oninput="updateBlockThroughputFromSlider(this.value)">
+                            <span id="modal-planned-tp" class="text-sm font-mono font-bold text-indigo-400">1200</span>
+                        </div>
+                        <p class="text-[10px] text-amber-400/80 mt-1"><i class="fa-solid fa-robot"></i> System Suggested: <span id="modal-suggested-tp">1150</span> units/hr</p>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-semibold text-slate-400 block mb-1">Current Output Rate</label>
+                        <div class="flex items-center space-x-2">
+                            <span id="modal-current-tp" class="text-xl font-bold text-emerald-400">1180</span>
+                            <span id="modal-efficiency-badge" class="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400">98% Efficient</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manpower Deployed Table -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-bold text-slate-200">Deployed Staff List &amp; Live Productivity</h4>
+                        <span class="text-xs text-slate-400"><span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse mr-1"></span> Blinking red indicates idle &gt; <span id="modal-idle-threshold-text">15</span> mins</span>
+                    </div>
+
+                    <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950/50">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase">
+                                <tr>
+                                    <th class="p-3">Staff Member</th>
+                                    <th class="p-3">Skill Level</th>
+                                    <th class="p-3">Target Rate</th>
+                                    <th class="p-3">Current Output</th>
+                                    <th class="p-3">Idle Duration</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="modal-mp-table-body" class="divide-y divide-slate-800/60 text-slate-300">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex justify-between items-center">
+                <span class="text-xs text-slate-500">Changes reflect instantly in flow simulation</span>
+                <button onclick="closeModal('block-modal')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-md transition">
+                    Done &amp; Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: STAGING STEP DRILL-DOWN -->
+    <div id="staging-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+                <h3 id="modal-staging-title" class="text-base font-bold text-white">Staging Buffer Overview</h3>
+                <button onclick="closeModal('staging-modal')" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400">Total Unique SKUs:</span>
+                        <span id="modal-staging-skus" class="font-mono font-bold text-slate-100 text-base">45 SKUs</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400">Total Unit Quantity:</span>
+                        <span id="modal-staging-qty" class="font-mono font-bold text-indigo-400 text-base">2,850 Units</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+                        <div>
+                            <span class="text-xs font-semibold text-amber-400 block">Staging Hold Time:</span>
+                            <span class="text-[10px] text-slate-500">(Qty / Next Step Hourly Rate)</span>
+                        </div>
+                        <span id="modal-staging-hours" class="font-mono font-bold text-amber-400 text-lg">2.4 Hours</span>
+                    </div>
+                </div>
+                <div class="bg-indigo-950/30 border border-indigo-500/20 p-3 rounded-xl text-xs text-indigo-300 flex items-start space-x-2">
+                    <i class="fa-solid fa-circle-info mt-0.5"></i>
+                    <span>If hold time exceeds 3.0 hours, system alerts will trigger auto-reallocation of staff to the succeeding block step.</span>
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50 text-right">
+                <button onclick="closeModal('staging-modal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: METRICS & PRIORITY TARGETS CONFIGURATION -->
+    <div id="metrics-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-white">Define Target Metrics &amp; Priority Rules</h3>
+                    <p class="text-xs text-slate-400">Set warehouse Service Level Agreements (SLAs) &amp; Alert Thresholds</p>
+                </div>
+                <button onclick="closeModal('metrics-modal')" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+                <!-- Metric 1: Receiving to Putaway TAT -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-slate-200">Receiving to Putaway TAT Target (Hours)</label>
+                        <span id="val-tat-target" class="font-mono text-sm text-indigo-400 font-bold">4.0 hrs</span>
+                    </div>
+                    <input type="range" id="input-tat-target" min="1" max="12" step="0.5" value="4.0" class="w-full accent-indigo-500" oninput="document.getElementById('val-tat-target').innerText = this.value + ' hrs'">
+                    <p class="text-[10px] text-slate-500">Applies to Inbound &amp; SRN processes.</p>
+                </div>
+
+                <!-- Metric 2: Audit Cycles -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <h4 class="text-xs font-bold text-slate-200 border-b border-slate-800 pb-1">Inventory Audit Cycle Targets (Days)</h4>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Fast Moving</label>
+                            <input type="number" value="7" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Slow Moving</label>
+                            <input type="number" value="30" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white font-mono">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-slate-400 block mb-1">Very Slow</label>
+                            <input type="number" value="90" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metric 3: Outbound Breach & Reverse SLA -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <label class="text-[11px] font-semibold text-slate-300 block mb-1">Outbound % Breach Limit</label>
+                        <input type="number" value="3.0" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-amber-400 font-mono font-bold">
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <label class="text-[11px] font-semibold text-slate-300 block mb-1">Supplier Return TAT (Days)</label>
+                        <input type="number" value="2" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white font-mono">
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                        <label class="text-[11px] font-semibold text-slate-300 block mb-1">Disposal SLA (Days)</label>
+                        <input type="number" value="5" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white font-mono">
+                    </div>
+                </div>
+
+                <!-- Idle Time Alert Config -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold text-slate-200">Personnel Idle Alert Threshold (X Mins)</label>
+                        <span id="val-idle-thresh" class="font-mono text-sm text-red-400 font-bold">15 mins</span>
+                    </div>
+                    <input type="range" id="input-idle-thresh" min="5" max="60" step="5" value="15" class="w-full accent-red-500" oninput="document.getElementById('val-idle-thresh').innerText = this.value + ' mins'; globalIdleThreshold = parseInt(this.value); updateDiagram();">
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex justify-end space-x-3">
+                <button onclick="closeModal('metrics-modal')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition">Save SLAs &amp; Targets</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: 5-DAY VOLUME PROJECTIONS & CSV UPLOAD -->
+    <div id="projection-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-white">5-Day Projected Volume &amp; Roster Feasibility</h3>
+                    <p class="text-xs text-slate-400">Forecasted throughput requirement vs. staffing capability</p>
+                </div>
+                <button onclick="closeModal('projection-modal')" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5">
+                <!-- CSV Upload simulation -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-dashed border-slate-700 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-file-csv text-2xl text-emerald-400"></i>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-200">Import Bulk Projections CSV</p>
+                            <p class="text-[10px] text-slate-400">Columns: Date, InboundUnits, OutboundUnits, ReturnsUnits</p>
+                        </div>
+                    </div>
+                    <button onclick="simulateCSVUpload()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-200 rounded border border-slate-700 transition">
+                        Upload CSV File
+                    </button>
+                </div>
+
+                <!-- 5 Day Grid Table -->
+                <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase">
+                            <tr>
+                                <th class="p-3">Day / Date</th>
+                                <th class="p-3">Inbound Units</th>
+                                <th class="p-3">Outbound Units</th>
+                                <th class="p-3">Returns Units</th>
+                                <th class="p-3">Roster Capacity</th>
+                                <th class="p-3">Feasibility Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projection-table-body" class="divide-y divide-slate-800 text-slate-300">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="projection-alert-box" class="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs flex items-center space-x-2">
+                    <i class="fa-solid fa-bell"></i>
+                    <span id="projection-alert-msg">System Alert: Day +3 projection exceeds current roster capacity by 18%.</span>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex justify-end">
+                <button onclick="closeModal('projection-modal')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition">Apply Projections</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: MANPOWER SKILL MATRIX & SHIFT ROSTER -->
+    <div id="manpower-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-white">Personnel Skill Matrix &amp; Shift Attendance Roster</h3>
+                    <p class="text-xs text-slate-400">Proficiency scores (1-5★), POC Roster, Leaves &amp; Cross-Deployment Skills</p>
+                </div>
+                <button onclick="closeModal('manpower-modal')" class="text-slate-400 hover:text-white p-1.5 rounded-lg bg-slate-800/50">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-5 overflow-y-auto flex-1">
+                <!-- Shift Attendance Summary Banner -->
+                <div class="grid grid-cols-3 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs">
+                    <div>
+                        <span class="text-slate-400 block mb-0.5">Intended Shift MP</span>
+                        <span class="text-lg font-bold text-white">52 Staff</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mb-0.5">Actual Turnout</span>
+                        <span class="text-lg font-bold text-emerald-400">48 Staff (92.3%)</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block mb-0.5">Planned Leaves / Weekly Offs</span>
+                        <span class="text-lg font-bold text-amber-400">4 Staff</span>
+                    </div>
+                </div>
+
+                <!-- Add Staff Control -->
+                <div class="flex justify-between items-center">
+                    <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider">All Warehouse Personnel Master List</h4>
+                    <button onclick="addNewStaffMember()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium rounded-lg transition flex items-center space-x-1">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
+                        <span>Add New Personnel</span>
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="border border-slate-800 rounded-xl overflow-hidden bg-slate-950">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-900 border-b border-slate-800 text-slate-400 font-semibold uppercase">
+                            <tr>
+                                <th class="p-3">Emp ID &amp; Name</th>
+                                <th class="p-3">Primary Role</th>
+                                <th class="p-3">Inbound Skill</th>
+                                <th class="p-3">Inventory Skill</th>
+                                <th class="p-3">Outbound Skill</th>
+                                <th class="p-3">Today Status</th>
+                                <th class="p-3 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manpower-master-table-body" class="divide-y divide-slate-800 text-slate-300">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex justify-end">
+                <button onclick="closeModal('manpower-modal')" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    /* Global Application State */
+    let globalIdleThreshold = 15; // in minutes
+
+    // 1. Block Steps Definition
+    let blockSteps = {
+        'grn': {
+            name: 'GRN Processing',
+            mpDeployed: 8,
+            plannedTp: 1200,
+            currentTp: 1180,
+            suggestedTp: 1150,
+            mpList: [
+                { id: 'MP-101', name: 'Alex Mercer', skill: 4, target: 150, current: 155, idleMins: 2, status: 'Active' },
+                { id: 'MP-102', name: 'Devon Vance', skill: 5, target: 160, current: 165, idleMins: 0, status: 'Active' },
+                { id: 'MP-103', name: 'Samir Patel', skill: 3, target: 140, current: 90, idleMins: 18, status: 'Idle' },
+                { id: 'MP-104', name: 'Elena Rostova', skill: 4, target: 150, current: 148, idleMins: 4, status: 'Active' },
+                { id: 'MP-105', name: 'Marcus Chen', skill: 2, target: 120, current: 125, idleMins: 1, status: 'Active' },
+                { id: 'MP-106', name: 'John Doe', skill: 3, target: 140, current: 138, idleMins: 5, status: 'Active' },
+                { id: 'MP-107', name: 'Sarah Connor', skill: 5, target: 170, current: 175, idleMins: 0, status: 'Active' },
+                { id: 'MP-108', name: 'Kyle Reese', skill: 4, target: 150, current: 140, idleMins: 3, status: 'Active' }
+            ]
+        },
+        'putaway': {
+            name: 'Putaway Execution',
+            mpDeployed: 10,
+            plannedTp: 1600,
+            currentTp: 1120, // Low -> Red Status
+            suggestedTp: 1500,
+            mpList: [
+                { id: 'MP-201', name: 'Lucas Hood', skill: 3, target: 150, current: 100, idleMins: 22, status: 'Idle' },
+                { id: 'MP-202', name: 'Job Sugard', skill: 4, target: 160, current: 110, idleMins: 25, status: 'Idle' },
+                { id: 'MP-203', name: 'Brock Lotus', skill: 2, target: 130, current: 120, idleMins: 19, status: 'Idle' },
+                { id: 'MP-204', name: 'Carrie Hope', skill: 5, target: 180, current: 175, idleMins: 2, status: 'Active' },
+                { id: 'MP-205', name: 'Siobhan Kelly', skill: 4, target: 160, current: 155, idleMins: 4, status: 'Active' }
+            ]
+        },
+        'picking': {
+            name: 'Order Picking',
+            mpDeployed: 14,
+            plannedTp: 2400,
+            currentTp: 2350,
+            suggestedTp: 2400,
+            mpList: [
+                { id: 'MP-301', name: 'David Miller', skill: 5, target: 200, current: 210, idleMins: 1, status: 'Active' },
+                { id: 'MP-302', name: 'Claire Temple', skill: 4, target: 180, current: 185, idleMins: 3, status: 'Active' },
+                { id: 'MP-303', name: 'Luke Cage', skill: 5, target: 210, current: 205, idleMins: 0, status: 'Active' }
+            ]
+        },
+        'packing': {
+            name: 'Order Packing',
+            mpDeployed: 10,
+            plannedTp: 2000,
+            currentTp: 1720, // Yellow status
+            suggestedTp: 1950,
+            mpList: [
+                { id: 'MP-401', name: 'Jessica Jones', skill: 4, target: 180, current: 170, idleMins: 8, status: 'Active' },
+                { id: 'MP-402', name: 'Danny Rand', skill: 3, target: 160, current: 150, idleMins: 12, status: 'Active' }
+            ]
+        },
+
+        /* Reverse and Auxiliary Flows */
+        'sup-pick': { name: 'Supplier Return Pick', mpDeployed: 2, plannedTp: 300, currentTp: 290, suggestedTp: 300, mpList: [] },
+        'sup-pack': { name: 'Supplier Return Pack', mpDeployed: 2, plannedTp: 300, currentTp: 285, suggestedTp: 300, mpList: [] },
+        'sup-disp': { name: 'Supplier Return Dispatch', mpDeployed: 1, plannedTp: 300, currentTp: 300, suggestedTp: 300, mpList: [] },
+
+        'disp-pick': { name: 'Disposal Pick', mpDeployed: 1, plannedTp: 150, currentTp: 140, suggestedTp: 150, mpList: [] },
+        'disp-pack': { name: 'Disposal Pack', mpDeployed: 1, plannedTp: 150, currentTp: 145, suggestedTp: 150, mpList: [] },
+        'disp-disp': { name: 'Disposal Out Gate', mpDeployed: 1, plannedTp: 150, currentTp: 150, suggestedTp: 150, mpList: [] },
+
+        'liq-pick': { name: 'Liquidation Pick', mpDeployed: 2, plannedTp: 400, currentTp: 410, suggestedTp: 400, mpList: [] },
+        'liq-pack': { name: 'Liquidation Pack', mpDeployed: 2, plannedTp: 400, currentTp: 390, suggestedTp: 400, mpList: [] },
+        'liq-disp': { name: 'Liquidation Dispatch', mpDeployed: 1, plannedTp: 400, currentTp: 400, suggestedTp: 400, mpList: [] }
+    };
+
+    // 2. Staging Steps Definition
+    let stagingSteps = {
+        'inbound-dock': { skus: 38, qty: 3400, nextTpKey: 'grn' },
+        'putaway-staging': { skus: 64, qty: 5800, nextTpKey: 'putaway' },
+        'pack-staging': { skus: 112, qty: 4200, nextTpKey: 'packing' },
+        'srn-staging': { skus: 22, qty: 1250, nextTpKey: 'putaway' },
+
+        'sup-pack-staging': { skus: 14, qty: 620, nextTpKey: 'sup-pack' },
+        'sup-disp-staging': { skus: 12, qty: 580, nextTpKey: 'sup-disp' },
+
+        'disp-pack-staging': { skus: 8, qty: 310, nextTpKey: 'disp-pack' },
+        'disp-disp-staging': { skus: 6, qty: 290, nextTpKey: 'disp-disp' },
+
+        'liq-pack-staging': { skus: 18, qty: 1100, nextTpKey: 'liq-pack' },
+        'liq-disp-staging': { skus: 15, qty: 980, nextTpKey: 'liq-disp' }
+    };
+
+    // 3. Projections Data
+    let projections = [
+        { day: 'Day 1 (Today)', inbound: 14500, outbound: 22000, returns: 1800, capacity: 40000, status: 'Feasible' },
+        { day: 'Day 2 (Tomorrow)', inbound: 16000, outbound: 24500, returns: 2000, capacity: 42000, status: 'Feasible' },
+        { day: 'Day 3 (+2 Days)', inbound: 19500, outbound: 28000, returns: 2400, capacity: 41000, status: 'Risk: Over Capacity' },
+        { day: 'Day 4 (+3 Days)', inbound: 15000, outbound: 21000, returns: 1900, capacity: 40000, status: 'Feasible' },
+        { day: 'Day 5 (+4 Days)', inbound: 14000, outbound: 20000, returns: 1700, capacity: 40000, status: 'Feasible' }
+    ];
+
+    // 4. Master Roster & Personnel Skill List
+    let masterStaff = [
+        { id: 'MP-101', name: 'Alex Mercer', role: 'Inbound Specialist', inboundSkill: 4, invSkill: 3, outboundSkill: 2, status: 'Present', assignedStep: 'grn' },
+        { id: 'MP-103', name: 'Samir Patel', role: 'Inbound Specialist', inboundSkill: 3, invSkill: 4, outboundSkill: 2, status: 'Present', assignedStep: 'grn' },
+        { id: 'MP-201', name: 'Lucas Hood', role: 'Putaway Handler', inboundSkill: 3, invSkill: 5, outboundSkill: 3, status: 'Present', assignedStep: 'putaway' },
+        { id: 'MP-202', name: 'Job Sugard', role: 'Inventory Tech', inboundSkill: 4, invSkill: 5, outboundSkill: 4, status: 'Present', assignedStep: 'putaway' },
+        { id: 'MP-301', name: 'David Miller', role: 'Outbound Picker', inboundSkill: 2, invSkill: 3, outboundSkill: 5, status: 'Present', assignedStep: 'picking' },
+        { id: 'MP-501', name: 'Rachel Green', role: 'Shift Lead', inboundSkill: 5, invSkill: 5, outboundSkill: 5, status: 'On Leave', assignedStep: 'None' },
+        { id: 'MP-502', name: 'Chandler Bing', role: 'Quality Auditor', inboundSkill: 3, invSkill: 4, outboundSkill: 3, status: 'Weekly Off', assignedStep: 'None' }
+    ];
+
+    let currentActiveModalBlockKey = null;
+
+    // Helper function to render a Block Step Node Card
+    function renderBlockNode(key, data) {
+        const ratio = data.currentTp / data.plannedTp;
+        let colorClass = 'border-emerald-500/60 bg-slate-900 node-glow-green';
+        let statusBadge = '<span class="bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded text-[10px] font-bold">ON TRACK</span>';
+
+        if (ratio < 0.70) {
+            colorClass = 'border-red-500/80 bg-slate-900 node-glow-red';
+            statusBadge = '<span class="bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded text-[10px] font-bold animate-pulse">BOTTLENECK</span>';
+        } else if (ratio < 0.90) {
+            colorClass = 'border-amber-500/70 bg-slate-900 node-glow-yellow';
+            statusBadge = '<span class="bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded text-[10px] font-bold">NEAR LIMIT</span>';
+        }
+
+        // Check for idle personnel blinking trigger
+        let idleCount = 0;
+        if (data.mpList) {
+            idleCount = data.mpList.filter(m => m.idleMins >= globalIdleThreshold).length;
+        }
+
+        const idleBlinkingClass = idleCount > 0 ? 'blinking-idle' : '';
+
+        return `
+            <div class="border-2 ${colorClass} ${idleBlinkingClass} rounded-xl p-3 shadow-lg relative transition-all duration-300">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-1.5 mb-2">
+                    <span class="font-bold text-xs text-slate-100 flex items-center gap-1.5">
+                        <i class="fa-solid fa-cubes-stacked text-indigo-400"></i> ${data.name}
+                    </span>
+                    ${statusBadge}
+                </div>
+                <div class="grid grid-cols-3 gap-1 text-center">
+                    <div class="bg-slate-950 p-1.5 rounded border border-slate-800/80">
+                        <span class="text-[9px] text-slate-400 uppercase block">MP Deployed</span>
+                        <span class="font-mono font-bold text-slate-100 text-xs">${data.mpDeployed} Staff</span>
+                    </div>
+                    <div class="bg-slate-950 p-1.5 rounded border border-slate-800/80">
+                        <span class="text-[9px] text-slate-400 uppercase block">Plan Rate</span>
+                        <span class="font-mono font-bold text-indigo-300 text-xs">${data.plannedTp}/h</span>
+                    </div>
+                    <div class="bg-slate-950 p-1.5 rounded border border-slate-800/80">
+                        <span class="text-[9px] text-slate-400 uppercase block">Current Output</span>
+                        <span class="font-mono font-bold text-xs ${ratio < 0.70 ? 'text-red-400' : 'text-emerald-400'}">${data.currentTp}/h</span>
+                    </div>
+                </div>
+                ${idleCount > 0 ? `
+                    <div class="mt-2 bg-red-950/80 border border-red-500/50 rounded p-1 text-center text-[10px] text-red-300 font-semibold flex items-center justify-center gap-1 animate-pulse">
+                        <i class="fa-solid fa-user-clock"></i> ${idleCount} Idle (&gt;${globalIdleThreshold}m) - Click to Inspect
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    // Helper function to render a Staging Step Node Card
+    function renderStagingNode(title, key) {
+        const data = stagingSteps[key];
+        const nextBlock = blockSteps[data.nextTpKey];
+        const hours = (data.qty / (nextBlock ? nextBlock.currentTp : 1000)).toFixed(1);
+
+        let holdColor = 'text-slate-300';
+        if (hours > 3.0) holdColor = 'text-red-400 font-bold';
+
+        return `
+            <div class="bg-indigo-950/40 border border-indigo-500/30 rounded-xl p-3 shadow">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs font-semibold text-indigo-300 flex items-center gap-1">
+                        <i class="fa-solid fa-dolly"></i> ${title}
+                    </span>
+                    <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">Buffer</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div>
+                        <span class="text-[9px] text-slate-400 block">SKU Count</span>
+                        <span class="font-mono font-bold text-slate-200">${data.skus}</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 block">Total Qty</span>
+                        <span class="font-mono font-bold text-indigo-300">${data.qty}</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 block">Staging Hold</span>
+                        <span class="font-mono ${holdColor}">${hours} hrs</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    /* Update Diagram Canvas Elements */
+    function updateDiagram() {
+        // Render Main Flow Block Steps
+        for (let key in blockSteps) {
+            const el = document.getElementById(`node-${key}`);
+            if (el) {
+                el.innerHTML = renderBlockNode(key, blockSteps[key]);
+            }
+        }
+
+        // Render Inbound Staging
+        const inDock = document.getElementById('node-inbound-dock');
+        if (inDock) inDock.innerHTML = renderStagingNode('Inbound Received Dock', 'inbound-dock');
+
+        const putawayStaging = document.getElementById('node-putaway-staging');
+        if (putawayStaging) putawayStaging.innerHTML = renderStagingNode('Putaway Staging', 'putaway-staging');
+
+        const packStaging = document.getElementById('node-pack-staging');
+        if (packStaging) packStaging.innerHTML = renderStagingNode('Pack Staging Buffer', 'pack-staging');
+
+        const srnStaging = document.getElementById('node-srn-staging');
+        if (srnStaging) srnStaging.innerHTML = renderStagingNode('SRN Staging Buffer', 'srn-staging');
+
+        // Render Auxiliary Staging Nodes
+        const auxStagings = ['sup-pack-staging', 'sup-disp-staging', 'disp-pack-staging', 'disp-disp-staging', 'liq-pack-staging', 'liq-disp-staging'];
+        auxStagings.forEach(stKey => {
+            const el = document.getElementById(`node-${stKey}`);
+            if (el) {
+                const titleParts = stKey.split('-');
+                const label = `${titleParts[0].toUpperCase()} ${titleParts[1]} Buffer`;
+                el.innerHTML = renderStagingNode(label, stKey);
+            }
+        });
+
+        // Update Header Summary Telemetry
+        let totalMP = 0;
+        let totalIdle = 0;
+        for (let k in blockSteps) {
+            totalMP += blockSteps[k].mpDeployed;
+            if (blockSteps[k].mpList) {
+                totalIdle += blockSteps[k].mpList.filter(m => m.idleMins >= globalIdleThreshold).length;
+            }
+        }
+        document.getElementById('stat-total-mp').innerText = totalMP;
+        document.getElementById('stat-idle-mp').innerText = totalIdle;
+
+        // Check for Bottleneck alerts
+        const bottlenecks = Object.keys(blockSteps).filter(k => (blockSteps[k].currentTp / blockSteps[k].plannedTp) < 0.70);
+        const alertBanner = document.getElementById('top-alert-banner');
+        if (bottlenecks.length > 0) {
+            alertBanner.classList.remove('hidden');
+            document.getElementById('top-alert-text').innerText = `${bottlenecks.length} Critical Bottleneck(s) Alert`;
+        } else {
+            alertBanner.classList.add('hidden');
+        }
+    }
+
+    /* Modal Management Functions */
+    function openModal(id) {
+        document.getElementById(id).classList.remove('hidden');
+        if (id === 'projection-modal') renderProjectionsTable();
+        if (id === 'manpower-modal') renderMasterManpowerTable();
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).classList.add('hidden');
+    }
+
+    // Open Block Step Detailed Inspection Modal
+    function openBlockModal(key) {
+        currentActiveModalBlockKey = key;
+        const block = blockSteps[key];
+        if (!block) return;
+
+        document.getElementById('modal-block-title').innerText = `${block.name} (Block Step)`;
+        document.getElementById('modal-mp-count').innerText = block.mpDeployed;
+        document.getElementById('modal-planned-tp').innerText = block.plannedTp;
+        document.getElementById('modal-suggested-tp').innerText = block.suggestedTp;
+        document.getElementById('modal-current-tp').innerText = block.currentTp;
+        document.getElementById('modal-throughput-slider').value = block.plannedTp;
+        document.getElementById('modal-idle-threshold-text').innerText = globalIdleThreshold;
+
+        const eff = Math.round((block.currentTp / block.plannedTp) * 100);
+        const effBadge = document.getElementById('modal-efficiency-badge');
+        effBadge.innerText = `${eff}% Capacity`;
+
+        if (eff < 70) {
+            effBadge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-red-500/20 text-red-400";
+            document.getElementById('modal-block-status-pill').className = "w-3.5 h-3.5 rounded-full bg-red-500 animate-ping";
+        } else if (eff < 90) {
+            effBadge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-amber-500/20 text-amber-400";
+            document.getElementById('modal-block-status-pill').className = "w-3.5 h-3.5 rounded-full bg-amber-500";
+        } else {
+            effBadge.className = "px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-500/20 text-emerald-400";
+            document.getElementById('modal-block-status-pill').className = "w-3.5 h-3.5 rounded-full bg-emerald-500";
+        }
+
+        renderBlockMPTable(block);
+        openModal('block-modal');
+    }
+
+    function renderBlockMPTable(block) {
+        const tbody = document.getElementById('modal-mp-table-body');
+        if (!block.mpList || block.mpList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No personnel currently logged into this step.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = block.mpList.map((m, idx) => {
+            const isIdleExceeded = m.idleMins >= globalIdleThreshold;
+            const blinkRowClass = isIdleExceeded ? 'bg-red-950/30 font-semibold text-red-300' : '';
+
+            // Stars for skill
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                stars += i < m.skill ? '<i class="fa-solid fa-star text-amber-400 text-[10px]"></i>' : '<i class="fa-regular fa-star text-slate-600 text-[10px]"></i>';
+            }
+
+            return `
+                <tr class="${blinkRowClass} hover:bg-slate-900/80 transition">
+                    <td class="p-3 font-semibold text-slate-100 flex items-center space-x-2">
+                        <span>${m.name}</span>
+                        <span class="text-[10px] text-slate-500 font-mono">(${m.id})</span>
+                    </td>
+                    <td class="p-3">${stars}</td>
+                    <td class="p-3 font-mono">${m.target} u/h</td>
+                    <td class="p-3 font-mono font-bold ${m.current >= m.target ? 'text-emerald-400' : 'text-amber-400'}">${m.current} u/h</td>
+                    <td class="p-3 font-mono ${isIdleExceeded ? 'text-red-400 font-extrabold animate-pulse' : 'text-slate-400'}">${m.idleMins} mins</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isIdleExceeded ? 'bg-red-500/20 text-red-400 border border-red-500/40' : 'bg-emerald-500/20 text-emerald-400'}">
+                            ${isIdleExceeded ? 'IDLE BREACH' : 'ACTIVE'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right">
+                        <button onclick="reallocateSingleStaff('${currentActiveModalBlockKey}', ${idx})" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] font-medium transition">
+                            Reallocate MP
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function updateBlockThroughputFromSlider(val) {
+        if (!currentActiveModalBlockKey) return;
+        blockSteps[currentActiveModalBlockKey].plannedTp = parseInt(val);
+        document.getElementById('modal-planned-tp').innerText = val;
+        updateDiagram();
+    }
+
+    // Open Staging Step Inspection Modal
+    function openStagingModal(title, key) {
+        const data = stagingSteps[key];
+        const nextBlock = blockSteps[data.nextTpKey];
+        const hours = (data.qty / (nextBlock ? nextBlock.currentTp : 1000)).toFixed(1);
+
+        document.getElementById('modal-staging-title').innerText = title;
+        document.getElementById('modal-staging-skus').innerText = `${data.skus} SKUs`;
+        document.getElementById('modal-staging-qty').innerText = `${data.qty.toLocaleString()} Units`;
+        document.getElementById('modal-staging-hours').innerText = `${hours} Hours`;
+
+        openModal('staging-modal');
+    }
+
+    /* Auto-Reallocation & AI Engine */
+    function triggerAutoBalance() {
+        // Find Bottleneck Steps (<70%) and Idle personnel (>15m)
+        let bottleneckKey = null;
+        for (let k in blockSteps) {
+            if ((blockSteps[k].currentTp / blockSteps[k].plannedTp) < 0.70) {
+                bottleneckKey = k;
+                break;
+            }
+        }
+
+        if (!bottleneckKey) {
+            alert('AI Engine Notice: All process steps are currently operating within target parameters. No auto-balancing required!');
+            return;
+        }
+
+        // Find idle personnel from another step
+        let movedCount = 0;
+        for (let k in blockSteps) {
+            if (k === bottleneckKey) continue;
+            let block = blockSteps[k];
+            if (block.mpList) {
+                let idleIdx = block.mpList.findIndex(m => m.idleMins >= globalIdleThreshold);
+                if (idleIdx !== -1) {
+                    let person = block.mpList.splice(idleIdx, 1)[0];
+                    person.idleMins = 0;
+                    person.status = 'Active';
+                    block.mpDeployed--;
+                    block.currentTp -= person.current;
+
+                    // Move to bottleneck
+                    blockSteps[bottleneckKey].mpList.push(person);
+                    blockSteps[bottleneckKey].mpDeployed++;
+                    blockSteps[bottleneckKey].currentTp += person.target;
+                    movedCount++;
+                    break;
+                }
+            }
+        }
+
+        updateDiagram();
+        if (movedCount > 0) {
+            alert(`AI Auto-Balancing Success: Reallocated idle personnel to bottleneck step [${blockSteps[bottleneckKey].name}]! Output rate boosted.`);
+        } else {
+            alert(`Bottleneck detected in [${blockSteps[bottleneckKey].name}], but no idle personnel with suitable skill levels were found in other zones.`);
+        }
+    }
+
+    function reallocateSingleStaff(sourceKey, idx) {
+        const person = blockSteps[sourceKey].mpList.splice(idx, 1)[0];
+        blockSteps[sourceKey].mpDeployed--;
+        blockSteps[sourceKey].currentTp -= person.current;
+
+        // Prompt for destination or send to lowest performing
+        const destKey = prompt("Enter target step code to reallocate to (e.g. putaway, picking, packing, grn):", "putaway");
+        if (destKey && blockSteps[destKey]) {
+            person.idleMins = 0;
+            person.status = 'Active';
+            blockSteps[destKey].mpList.push(person);
+            blockSteps[destKey].mpDeployed++;
+            blockSteps[destKey].currentTp += person.target;
+            alert(`Reallocated ${person.name} to ${blockSteps[destKey].name}`);
+        } else {
+            // Return to source
+            blockSteps[sourceKey].mpList.push(person);
+            blockSteps[sourceKey].mpDeployed++;
+            blockSteps[sourceKey].currentTp += person.current;
+        }
+
+        updateDiagram();
+        if (currentActiveModalBlockKey) renderBlockMPTable(blockSteps[currentActiveModalBlockKey]);
+    }
+
+    /* Projections & Master Roster Renderers */
+    function renderProjectionsTable() {
+        const tbody = document.getElementById('projection-table-body');
+        tbody.innerHTML = projections.map(p => `
+            <tr class="hover:bg-slate-900/50">
+                <td class="p-3 font-semibold text-slate-200">${p.day}</td>
+                <td class="p-3 font-mono text-indigo-300">${p.inbound.toLocaleString()}</td>
+                <td class="p-3 font-mono text-blue-300">${p.outbound.toLocaleString()}</td>
+                <td class="p-3 font-mono text-purple-300">${p.returns.toLocaleString()}</td>
+                <td class="p-3 font-mono text-slate-400">${p.capacity.toLocaleString()}</td>
+                <td class="p-3">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${p.status.includes('Risk') ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-emerald-500/20 text-emerald-400'}">
+                        ${p.status}
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function simulateCSVUpload() {
+        alert("Simulating CSV Parsing... Successfully imported 5-day projected volume matrix from 'warehouse_forecast_q3.csv'.");
+        projections[2].inbound += 2000;
+        renderProjectionsTable();
+    }
+
+    function renderMasterManpowerTable() {
+        const tbody = document.getElementById('manpower-master-table-body');
+        tbody.innerHTML = masterStaff.map((s, idx) => `
+            <tr class="hover:bg-slate-900/50">
+                <td class="p-3 font-semibold text-slate-100">${s.name} <span class="text-[10px] text-slate-500 font-mono block">${s.id}</span></td>
+                <td class="p-3 text-slate-300">${s.role}</td>
+                <td class="p-3">${s.inboundSkill}★</td>
+                <td class="p-3">${s.invSkill}★</td>
+                <td class="p-3">${s.outboundSkill}★</td>
+                <td class="p-3">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${s.status === 'Present' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">
+                        ${s.status}
+                    </span>
+                </td>
+                <td class="p-3 text-right">
+                    <button onclick="toggleStaffStatus(${idx})" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] rounded border border-slate-700">
+                        Toggle Roster
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function toggleStaffStatus(idx) {
+        masterStaff[idx].status = masterStaff[idx].status === 'Present' ? 'On Leave' : 'Present';
+        renderMasterManpowerTable();
+    }
+
+    function addNewStaffMember() {
+        const name = prompt("Enter new employee name:");
+        if (!name) return;
+        masterStaff.push({
+            id: `MP-${Math.floor(100 + Math.random() * 900)}`,
+            name: name,
+            role: 'Cross-functional Staff',
+            inboundSkill: 3,
+            invSkill: 3,
+            outboundSkill: 3,
+            status: 'Present',
+            assignedStep: 'grn'
+        });
+        renderMasterManpowerTable();
+    }
+
+    /* Live Telemetry Simulation Timer Engine */
+    setInterval(() => {
+        // Increment idle time slightly for idle personnel
+        for (let k in blockSteps) {
+            if (blockSteps[k].mpList) {
+                blockSteps[k].mpList.forEach(m => {
+                    if (Math.random() > 0.6) {
+                        m.idleMins += 1;
+                    }
+                });
+            }
+        }
+        updateDiagram();
+    }, 12000); // Ticks every 12s
+
+    // On Load Initializer
+    window.onload = function() {
+        updateDiagram();
+    };
+</script>
+
+</body>
+</html>
